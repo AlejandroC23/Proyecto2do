@@ -1,21 +1,21 @@
-CREATE TABLE Personas (
-    per_id INT AUTO_INCREMENT PRIMARY KEY,
-    per_nombre VARCHAR(100) NOT NULL,
-    per_apellido VARCHAR(100) NOT NULL,
-    per_cedula VARCHAR(24) NOT NULL UNIQUE,
-    per_usuario VARCHAR(50) NOT NULL,
-    per_clave VARCHAR(24) NOT NULL,
-    per_telefono VARCHAR(15) NOT NULL,
-    per_correoElectronico VARCHAR(100) NOT NULL,
-    per_direccion VARCHAR(200) NOT NULL
+CREATE TABLE Usuarios (
+    usu_id INT AUTO_INCREMENT PRIMARY KEY,
+    usu_nombre VARCHAR(100) NOT NULL,
+    usu_apellido VARCHAR(100) NOT NULL,
+    usu_cedula VARCHAR(24) NOT NULL UNIQUE,
+    usu_clave VARCHAR(24) NOT NULL,
+    usu_telefono VARCHAR(15) NOT NULL,
+    usu_correoElectronico VARCHAR(100) NOT NULL,
+    usu_direccion VARCHAR(200) NOT NULL,
+    usu_rol INT NOT NULL
 );
 
 CREATE TABLE Encargados (
     enc_id INT AUTO_INCREMENT PRIMARY KEY,
     enc_titulo VARCHAR(100) NOT NULL,
     enc_cargo VARCHAR(100) NOT NULL,
-    per_id INT NOT NULL,
-    FOREIGN KEY (per_id) REFERENCES Personas(per_id)
+    usu_id INT NOT NULL,
+    FOREIGN KEY (usu_id) REFERENCES Usuarios(usu_id)
 );
 
 CREATE TABLE Laboratorios (
@@ -32,8 +32,9 @@ CREATE TABLE Estudiantes (
     est_finalizoMantenimiento BOOLEAN NOT NULL,
     car_id INT NOT NULL,
     est_nivelCarrera INT NOT NULL,
-    per_id INT NOT NULL,
-    FOREIGN KEY (per_id) REFERENCES Personas(per_id)
+    usu_id INT NOT NULL,
+    FOREIGN KEY (usu_id) REFERENCES Usuarios(usu_id),
+    FOREIGN KEY (car_id) REFERENCES Carreras(car_id)
 );
 
 CREATE TABLE Carreras (

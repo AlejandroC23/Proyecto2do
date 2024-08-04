@@ -8,23 +8,25 @@ package modelo;
  *
  * @author Alejandro
  */
-public class Estudiante extends Persona {
+public class Estudiante extends Usuario {
     
     private int idEstudiante;
     private String matricula;
-    private boolean finalizoMantenimiento;
+    private int finalizoMantenimiento;
     private Carrera carrera;
+    private int nivelCarrera;
     private int idPersona;
 
     public Estudiante() {
     }
 
-    public Estudiante(int idEstudiante, String matricula, boolean finalizoMantenimiento, Carrera carrera, int idPersona, String nombre, String apellido, String correoElectronico, String direccion, String telefono, String cedula, String clave) {
-        super(idPersona, nombre, apellido, correoElectronico, direccion, telefono, cedula, clave);
+    public Estudiante(int idEstudiante, String matricula, int finalizoMantenimiento, Carrera carrera, int nivelCarrera, int idPersona, String nombre, String apellido, String correoElectronico, String direccion, String telefono, String cedula, String clave, int rol) {
+        super(idPersona, nombre, apellido, correoElectronico, direccion, telefono, cedula, clave, rol);
         this.idEstudiante = idEstudiante;
         this.matricula = matricula;
         this.finalizoMantenimiento = finalizoMantenimiento;
         this.carrera = carrera;
+        this.nivelCarrera = nivelCarrera;
         this.idPersona = idPersona;
     }
 
@@ -44,11 +46,11 @@ public class Estudiante extends Persona {
         this.matricula = matricula;
     }
 
-    public boolean isFinalizoMantenimiento() {
+    public int getFinalizoMantenimiento() {
         return finalizoMantenimiento;
     }
 
-    public void setFinalizoMantenimiento(boolean finalizoMantenimiento) {
+    public void setFinalizoMantenimiento(int finalizoMantenimiento) {
         this.finalizoMantenimiento = finalizoMantenimiento;
     }
 
@@ -60,6 +62,14 @@ public class Estudiante extends Persona {
         this.carrera = carrera;
     }
 
+    public int getNivelCarrera() {
+        return nivelCarrera;
+    }
+
+    public void setNivelCarrera(int nivelCarrera) {
+        this.nivelCarrera = nivelCarrera;
+    }
+    
     @Override
     public int getIdPersona() {
         return idPersona;

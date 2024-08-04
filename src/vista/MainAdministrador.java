@@ -8,7 +8,7 @@ package vista;
  * @author User
  */
 public class MainAdministrador {
-    public static void main(String[] args) {
+    public static void main() {
         
     }
 }

@@ -8,7 +8,7 @@ package modelo;
  *
  * @author Alejandro
  */
-public class Encargado extends Persona {
+public class Encargado extends Usuario {
 
     private int idEncargado;
     private String titulo;
@@ -18,8 +18,8 @@ public class Encargado extends Persona {
     public Encargado() {
     }
 
-    public Encargado(int idEncargado, String titulo, String cargo, int idPersona, String nombre, String apellido, String correoElectronico, String direccion, String telefono, String cedula, String clave) {
-        super(idPersona, nombre, apellido, correoElectronico, direccion, telefono, cedula, clave);
+    public Encargado(int idEncargado, String titulo, String cargo, int idPersona, String nombre, String apellido, String correoElectronico, String direccion, String telefono, String cedula, String clave, int rol) {
+        super(idPersona, nombre, apellido, correoElectronico, direccion, telefono, cedula, clave, rol);
         this.idEncargado = idEncargado;
         this.titulo = titulo;
         this.cargo = cargo;

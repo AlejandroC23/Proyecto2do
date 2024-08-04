@@ -8,24 +8,9 @@ package modelo;
  *
  * @author Alejandro
  */
-public class Administrador extends Persona {
-    
-    private int  idAdministrador;
+public class Administrador extends Usuario {
 
     public Administrador() {
-    }
-
-    public Administrador(int idAdministrador, int idPersona, String nombre, String apellido, String correoElectronico, String direccion, String telefono, String cedula, String clave) {
-        super(idPersona, nombre, apellido, correoElectronico, direccion, telefono, cedula, clave);
-        this.idAdministrador = idAdministrador;
-    }
-    
-    public int getIdAdministrador() {
-        return idAdministrador;
-    }
-
-    public void setIdAdministrador(int idAdministrador) {
-        this.idAdministrador = idAdministrador;
     }
     
     public String imprimir(){

@@ -4,11 +4,13 @@
  */
 package modelo;
 
+import vista.Funciones;
+
 /**
  *
  * @author Alejandro
  */
-public class Persona {
+public class Usuario {
 
     private int idPersona;
     private String nombre;
@@ -18,11 +20,12 @@ public class Persona {
     private String telefono;
     private String cedula;
     private String clave;
+    private int rol;
 
-    public Persona() {
+    public Usuario() {
     }
 
-    public Persona(int idPersona, String nombre, String apellido, String correoElectronico, String direccion, String telefono, String cedula, String clave) {
+    public Usuario(int idPersona, String nombre, String apellido, String correoElectronico, String direccion, String telefono, String cedula, String clave, int rol) {
         this.idPersona = idPersona;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -31,6 +34,7 @@ public class Persona {
         this.telefono = telefono;
         this.cedula = cedula;
         this.clave = clave;
+        this.rol = rol;
     }
 
     public int getIdPersona() {
@@ -97,6 +101,14 @@ public class Persona {
         this.clave = clave;
     }
 
+    public int getRol() {
+        return rol;
+    }
+
+    public void setRol(int rol) {
+        this.rol = rol;
+    }
+
     @Override
     public String toString() {
         return "Nombre: " + getNombre() + "\n"
@@ -106,5 +118,34 @@ public class Persona {
                 + "Direccion" + getDireccion() + "\n"
                 + "Cedula" + getCedula() + "\n"
                 + "Clave:" + "************\n";
+    }
+    
+    public boolean validarCedula(String c){
+        if (c == null || c.length() != 10) {
+            return false;
+        }
+
+        if (!c.matches("\\d{10}")) {
+            return false;
+        }
+
+        int codigoProvincia = Integer.parseInt(c.substring(0, 2));
+        int tercerDigito = Integer.parseInt(c.substring(2, 3));
+
+        if (codigoProvincia < 1 || codigoProvincia > 24 || tercerDigito >= 6) {
+            return false;
+        }
+
+        int[] coeficientes = {2, 1, 2, 1, 2, 1, 2, 1, 2};
+        int sum = 0;
+
+        for (int i = 0; i < 9; i++) {
+            int digito = Character.getNumericValue(c.charAt(i)) * coeficientes[i];
+            sum += digito > 9 ? digito - 9 : digito;
+        }
+
+        int comprobadorDigito = (10 - (sum % 10)) % 10;
+
+        return comprobadorDigito == Character.getNumericValue(c.charAt(9));
     }
 }
