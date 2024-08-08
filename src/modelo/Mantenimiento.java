@@ -4,6 +4,8 @@
  */
 package modelo;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Alejandro
@@ -11,17 +13,22 @@ package modelo;
 public class Mantenimiento {
      
     private int idMantenimiento;
-    private int idComputadora;
-    private int idLaboratorio;
-    private int idEstudiante;
-    private String descripcion;
+    private Laboratorio laboratorio;
+    private String fechaInicio;
+    private String fechaFin;
+    private ArrayList<DetalleMantenimiento> detMantenimientos;
+    private ArrayList<Estudiante> estudiantes;
 
-    public Mantenimiento(int idMantenimiento, int idComputadora, int idLaboratorio, int idEstudiante, String descripcion) {
+    public Mantenimiento() {
+    }
+
+    public Mantenimiento(int idMantenimiento, Laboratorio laboratorio, String fechaInicio, String fechaFin, ArrayList<DetalleMantenimiento> detMantenimientos, ArrayList<Estudiante> estudiantes) {
         this.idMantenimiento = idMantenimiento;
-        this.idComputadora = idComputadora;
-        this.idLaboratorio = idLaboratorio;
-        this.idEstudiante = idEstudiante;
-        this.descripcion = descripcion;
+        this.laboratorio = laboratorio;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.detMantenimientos = detMantenimientos;
+        this.estudiantes = estudiantes;
     }
 
     public int getIdMantenimiento() {
@@ -32,37 +39,43 @@ public class Mantenimiento {
         this.idMantenimiento = idMantenimiento;
     }
 
-    public int getIdComputadora() {
-        return idComputadora;
+    public Laboratorio getLaboratorio() {
+        return laboratorio;
     }
 
-    public void setIdComputadora(int idComputadora) {
-        this.idComputadora = idComputadora;
+    public void setLaboratorio(Laboratorio laboratorio) {
+        this.laboratorio = laboratorio;
     }
 
-    public int getIdLaboratorio() {
-        return idLaboratorio;
+    public String getFechaInicio() {
+        return fechaInicio;
     }
 
-    public void setIdLaboratorio(int idLaboratorio) {
-        this.idLaboratorio = idLaboratorio;
+    public void setFechaInicio(String fechaInicio) {
+        this.fechaInicio = fechaInicio;
     }
 
-    public int getIdEstudiante() {
-        return idEstudiante;
+    public String getFechaFin() {
+        return fechaFin;
     }
 
-    public void setIdEstudiante(int idEstudiante) {
-        this.idEstudiante = idEstudiante;
+    public void setFechaFin(String fechaFin) {
+        this.fechaFin = fechaFin;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public ArrayList<DetalleMantenimiento> getDetMantenimientos() {
+        return detMantenimientos;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setDetMantenimientos(ArrayList<DetalleMantenimiento> detMantenimientos) {
+        this.detMantenimientos = detMantenimientos;
     }
-    
-    
+
+    public ArrayList<Estudiante> getEstudiantes() {
+        return estudiantes;
+    }
+
+    public void setEstudiantes(ArrayList<Estudiante> estudiantes) {
+        this.estudiantes = estudiantes;
+    }
 }

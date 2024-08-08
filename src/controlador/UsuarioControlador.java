@@ -61,7 +61,7 @@ public class UsuarioControlador {
         }
     }
     
-    public int buscarIdPersona(String cedula){
+    public int buscarIdUsuario(String cedula){
         try {
             String consulta = "SELECT usu_id FROM usuarios "
                     + "WHERE usu_cedula = '" + cedula + "';";

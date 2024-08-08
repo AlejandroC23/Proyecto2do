@@ -4,7 +4,7 @@
  */
 package modelo;
 
-import vista.Funciones;
+import controlador.Funciones;
 
 /**
  *
@@ -12,7 +12,7 @@ import vista.Funciones;
  */
 public class Usuario {
 
-    private int idPersona;
+    private int idUsuario;
     private String nombre;
     private String apellido;
     private String correoElectronico;
@@ -25,8 +25,8 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(int idPersona, String nombre, String apellido, String correoElectronico, String direccion, String telefono, String cedula, String clave, int rol) {
-        this.idPersona = idPersona;
+    public Usuario(int idUsuario, String nombre, String apellido, String correoElectronico, String direccion, String telefono, String cedula, String clave, int rol) {
+        this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.apellido = apellido;
         this.correoElectronico = correoElectronico;
@@ -37,12 +37,12 @@ public class Usuario {
         this.rol = rol;
     }
 
-    public int getIdPersona() {
-        return idPersona;
+    public int getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setIdPersona(int idPersona) {
-        this.idPersona = idPersona;
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getNombre() {

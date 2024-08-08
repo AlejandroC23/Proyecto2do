@@ -37,7 +37,7 @@ public class EstudianteControlador {
                     + est.getFinalizoMantenimiento() + ", " 
                     + est.getCarrera().getIdCarrera() + ", " 
                     + est.getNivelCarrera() + ", " 
-                    + est.getIdPersona() + ");";
+                    + est.getIdUsuario() + ");";
             
             ejecutar =(PreparedStatement) connection.prepareCall(consulta);
             
@@ -175,7 +175,7 @@ public class EstudianteControlador {
             ejecutar.setString(4, est.getTelefono());
             ejecutar.setString(5, est.getCorreoElectronico());
             ejecutar.setString(6, est.getDireccion());
-            ejecutar.setString(7, est.getApellido());
+            ejecutar.setString(7, est.getCedula());
             
             //Ejecutar la consulta
             int res = ejecutar.executeUpdate();

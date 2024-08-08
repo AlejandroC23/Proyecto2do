@@ -4,6 +4,7 @@
  */
 package vista;
 
+import controlador.Funciones;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -64,7 +65,7 @@ public class Main {
                 }
                 //Opción 2 - Encargado
                 case "2" -> {
-                    MainEncargado.main();
+                    MainEncargado.main(args);
                 }
                 case "3" -> {
                     MainAdministrador.main();

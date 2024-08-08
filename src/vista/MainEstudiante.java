@@ -4,6 +4,7 @@
  */
 package vista;
 
+import controlador.Funciones;
 import controlador.CarreraControlador;
 import controlador.EstudianteControlador;
 import controlador.UsuarioControlador;
@@ -11,7 +12,6 @@ import java.util.Scanner;
 import modelo.Estudiante;
 import modelo.Usuario;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.IOException;
@@ -24,9 +24,9 @@ import modelo.Carrera;
  * @author Alejandro
  */
 public class MainEstudiante {
-    
+
     //Impresión de menú de inicio de sesión y registro
-    public static void menuLogeoEstudiante(){
+    public static void menuLogeoEstudiante() {
         System.out.println("""
         -------------------------------------------
                        Logeo Estudiante            
@@ -39,42 +39,42 @@ public class MainEstudiante {
         """.indent(30));
         System.out.print("  Opcion: ");
     }
-    
+
     //Menú de inicio de sesión y registro
-    public static Estudiante logeoEstudiante() throws IOException{
+    public static Estudiante logeoEstudiante() throws IOException {
         //Variables
         Scanner s = new Scanner(System.in);
         Estudiante est = new Estudiante();
         String opcEst;
-        do{
+        do {
             //Menú Logeo Estudiante
             Funciones.cls();
             menuLogeoEstudiante();
             opcEst = s.next();
-            
+
             switch (opcEst) {
                 //Inicio de sesión
                 case "1" -> {
-                    do{
+                    do {
                         Funciones.cls();
                         est = inicioSesion();
-                        if("0".equals(est.getCedula())){
+                        if ("0".equals(est.getCedula())) {
                             Funciones.cls();
                             System.out.println("Usuario o contraseña incorrecto...\n");
-                            System.out.print("¿Desea regresar al logeo? [Y/n] ");
+                            System.out.print("¿Desea regresar al menú anterior? [Y/n] ");
                             String opcYN = s.next();
-                            if("Y".equals(opcYN)){
+                            if ("Y".equals(opcYN)) {
                                 break;
-                            }else if("n".equals(opcYN)){
-                            }else{
+                            } else if ("n".equals(opcYN)) {
+                            } else {
                                 Funciones.cls();
                                 System.out.println("¡ERROR! Ingrese una opción correcta.");
                                 Funciones.pause();
                             }
-                        }else{
+                        } else {
                             return est;
                         }
-                    }while(true);
+                    } while (true);
                     break;
                 }
                 //Registrarse
@@ -85,6 +85,9 @@ public class MainEstudiante {
                 }
                 //Regresar
                 case "3" -> {
+                    continue;
+                }
+                case "4" -> {
                     System.out.println("Regresando...");
                     return null;
                 }
@@ -94,19 +97,19 @@ public class MainEstudiante {
                     Funciones.pause();
                 }
             }
-        }while(!"3".equals(opcEst));
+        } while (!"3".equals(opcEst));
         return est;
     }
-    
+
     //Inicio de sesión de usuario
-    public static Estudiante inicioSesion() throws IOException{
+    public static Estudiante inicioSesion() throws IOException {
         EstudianteControlador estC = new EstudianteControlador();
         Estudiante est = new Estudiante();
-        
+
         InputStream inputStream = System.in;
         Reader reader = new InputStreamReader(inputStream, "UTF-8");
         BufferedReader br = new BufferedReader(reader);
-        
+
         Scanner s = new Scanner(System.in);
         System.out.println("""
                     --------------------------------------
@@ -117,27 +120,27 @@ public class MainEstudiante {
         String usuario = br.readLine();
         System.out.print("     Clave: ");
         String clave = br.readLine();
-        
-        if(Funciones.isValidNumeric(usuario) && Funciones.isValidPassword(clave)){
+
+        if (Funciones.isValidNumeric(usuario) && Funciones.isValidPassword(clave)) {
             est = estC.buscarEstudiante(usuario, clave);
-        }else{
+        } else {
             est.setCedula("0");
         }
-        
+
         return est;
     }
-    
+
     //Registro de usuario
     public static void registro() throws IOException {
         InputStream inputStream = System.in;
         Reader reader = new InputStreamReader(inputStream, "UTF-8");
         BufferedReader br = new BufferedReader(reader);
         Scanner s = new Scanner(System.in);
-        
+
         EstudianteControlador estc = new EstudianteControlador();
         UsuarioControlador usuc = new UsuarioControlador();
         CarreraControlador carc = new CarreraControlador();
-        
+
         Usuario usu = new Usuario();
         Estudiante est = new Estudiante();
         String titulo = """
@@ -145,17 +148,17 @@ public class MainEstudiante {
                                       Registro Cuenta
                     --------------------------------------------------                
         """;
-        
-        do{
+
+        do {
             //Campo - Cédula
-            do{
+            do {
                 Funciones.cls();
                 System.out.print(titulo);
                 System.out.println("                    ¡Recuerde que este será tu usuario!");
                 System.out.print("  Ingrese su cédula: ");
                 String cedula = s.next();
-                if(usu.validarCedula(cedula)){
-                    if(usuc.existeCuenta(cedula)){
+                if (usu.validarCedula(cedula)) {
+                    if (usuc.existeCuenta(cedula)) {
                         Funciones.cls();
                         System.out.println("""
                                             ¡ERROR! Ya existe una cuenta registrada en el sistema con esta cédula
@@ -164,436 +167,230 @@ public class MainEstudiante {
                         Funciones.pause();
                         main(null);
                         break;
-                    }else{
-                        String opcYN;
-                        do {
-                            Funciones.cls();
-                            usu.setCedula(cedula);
-                            System.out.println("La cédula ingresada es: " + usu.getCedula());
-                            System.out.print("¿Es correcto? [Y/n] ");
-                            opcYN = s.next();
-                            switch (opcYN) {
-                                case "Y" -> {
-                                    break;
-                                }
-                                case "n" -> {
-                                    break;
-                                }
-                                default -> {
-                                    Funciones.cls();
-                                    System.out.println("¡ERROR! Ingrese una opción correcta.");
-                                    Funciones.pause();
-                                }
-                            }
-                        } while (!"n".equals(opcYN) && !"Y".equals(opcYN));
-                        
-                        if("Y".equals(opcYN)){
-                            break;
-                        }
+                    } else {
+                        usu.setCedula(cedula);
+                        break;
                     }
-                }else{
+                } else {
                     Funciones.cls();
-                        System.out.println("""
+                    System.out.println("""
                                                 ¡ERROR! Ingrese una cédula correcta.
                                            """);
-                        Funciones.pause();
+                    Funciones.pause();
                 }
-            }while(true);
-            
+            } while (true);
+
             //Campo - Nombre
-            do{
+            do {
                 Funciones.cls();
                 System.out.print(titulo);
                 System.out.print("  Ingrese sus nombres: ");
-                String nombres = s.next();
-                if(Funciones.isValidText(nombres) == false){
+                String nombres = br.readLine();
+                if (Funciones.isValidText(nombres) == false) {
                     Funciones.cls();
                     System.out.println("    ¡ERROR! No puede ingresar caracteres "
                             + "especiales o números, ingrese su nombres nuevamente.");
                     Funciones.pause();
-                }else{
-                    String opcYN;
-                    do {
-                        Funciones.cls();
-                        usu.setNombre(nombres.toUpperCase());
-                            System.out.println("Los nombres ingresados son: " + usu.getNombre());
-                        System.out.print("¿Es correcto? [Y/n] ");
-                        opcYN = s.next();
-                        switch (opcYN) {
-                            case "Y" -> {
-                                break;
-                            }
-                            case "n" -> {
-                                break;
-                            }
-                            default -> {
-                                Funciones.cls();
-                                System.out.println("¡ERROR! Ingrese una opción correcta.");
-                                Funciones.pause();
-                            }
-                        }
-                    } while (!"n".equals(opcYN) && !"Y".equals(opcYN));
-
-                    if("Y".equals(opcYN)){
-                        break;
-                    }
+                } else {
+                    usu.setNombre(nombres.toUpperCase());
+                    break;
                 }
-            }while(true);
-            
+            } while (true);
+
             //Campo - Apellidos
-            do{
+            do {
                 Funciones.cls();
                 System.out.print(titulo);
                 System.out.print("  Ingrese sus apellidos: ");
                 String apellidos = br.readLine();
-                if(Funciones.isValidText(apellidos) == false){
+                if (Funciones.isValidText(apellidos) == false) {
                     Funciones.cls();
                     System.out.println("    ¡ERROR! No puede ingresar caracteres "
                             + "especiales o números, ingrese su apellidos nuevamente.");
                     Funciones.pause();
-                }else{
-                    String opcYN;
-                    do {
-                        Funciones.cls();
-                        usu.setApellido(apellidos.toUpperCase());
-                            System.out.println("Los apellidos ingresados son: " + usu.getApellido());
-                        System.out.print("¿Es correcto? [Y/n] ");
-                        opcYN = s.next();
-                        switch (opcYN) {
-                            case "Y" -> {
-                                break;
-                            }
-                            case "n" -> {
-                                break;
-                            }
-                            default -> {
-                                Funciones.cls();
-                                System.out.println("¡ERROR! Ingrese una opción correcta.");
-                                Funciones.pause();
-                            }
-                        }
-                    } while (!"n".equals(opcYN) && !"Y".equals(opcYN));
-
-                    if("Y".equals(opcYN)){
-                        break;
-                    }
+                } else {
+                    usu.setApellido(apellidos.toUpperCase());
+                    break;
                 }
-            }while(true);
-            
+            } while (true);
+
             //Campo - Email
-            do{
+            do {
                 Funciones.cls();
                 System.out.print(titulo);
                 System.out.print("  Ingrese su email: ");
                 String email = br.readLine();
-                if(Funciones.isValidEmail(email) == false){
+                if (Funciones.isValidEmail(email) == false) {
                     Funciones.cls();
                     System.out.println("    ¡ERROR! El correo eléctronico ingresado "
                             + "es incorrecto, ingrese su correo nuevamente.");
                     Funciones.pause();
-                }else{
-                    String opcYN;
-                    do {
-                        Funciones.cls();
-                        usu.setCorreoElectronico(email);
-                        System.out.println("El email ingresado es: " + usu.getCorreoElectronico());
-                        System.out.print("¿Es correcto? [Y/n] ");
-                        opcYN = s.next();
-                        switch (opcYN) {
-                            case "Y" -> {
-                                break;
-                            }
-                            case "n" -> {
-                                break;
-                            }
-                            default -> {
-                                Funciones.cls();
-                                System.out.println("¡ERROR! Ingrese una opción correcta.");
-                                Funciones.pause();
-                            }
-                        }
-                    } while (!"n".equals(opcYN) && !"Y".equals(opcYN));
-
-                    if("Y".equals(opcYN)){
-                        break;
-                    }
+                } else {
+                    Funciones.cls();
+                    usu.setCorreoElectronico(email);
+                    break;
+                    
                 }
-            }while(true);
-            
+            } while (true);
+
             //Campo - Dirección
-            do{
+            do {
                 Funciones.cls();
                 System.out.print(titulo);
                 System.out.print("  Ingrese su dirección: ");
                 String direccion = br.readLine();
-                if(Funciones.isValidAdress(direccion) == false){
+                if (Funciones.isValidAdress(direccion) == false) {
                     Funciones.cls();
                     System.out.println("    ¡ERROR! No puede ingresar caracteres "
                             + "especiales, ingrese su dirección nuevamente.");
                     Funciones.pause();
-                }else{
-                    String opcYN;
-                    do {
-                        Funciones.cls();
-                        usu.setDireccion(direccion.toUpperCase());
-                        System.out.println("La dirección ingresada es: " + usu.getDireccion());
-                        System.out.print("¿Es correcto? [Y/n] ");
-                        opcYN = s.next();
-                        switch (opcYN) {
-                            case "Y" -> {
-                                break;
-                            }
-                            case "n" -> {
-                                break;
-                            }
-                            default -> {
-                                Funciones.cls();
-                                System.out.println("¡ERROR! Ingrese una opción correcta.");
-                                Funciones.pause();
-                            }
-                        }
-                    } while (!"n".equals(opcYN) && !"Y".equals(opcYN));
-
-                    if("Y".equals(opcYN)){
-                        break;
-                    }
+                } else {
+                    usu.setDireccion(direccion.toUpperCase());
+                    break;
                 }
-            }while(true);
-            
+            } while (true);
+
             //Campo - Teléfono
-            do{
+            do {
                 Funciones.cls();
                 System.out.print(titulo);
                 System.out.print("  Ingrese su teléfono: ");
                 String telefono = br.readLine();
-                if(Funciones.isValidNumeric(telefono) == false){
+                if (Funciones.isValidNumeric(telefono) == false) {
                     Funciones.cls();
                     System.out.println("    ¡ERROR! No puede ingresar caracteres "
                             + "especiales o letras, ingrese su teléfono nuevamente.");
                     Funciones.pause();
-                }else{
-                    if(telefono.length() == 10){
-                        String opcYN;
-                        do {
-                            Funciones.cls();
-                            usu.setTelefono(telefono);
-                            System.out.println("El teléfono ingresado es: " + usu.getTelefono());
-                            System.out.print("¿Es correcto? [Y/n] ");
-                            opcYN = s.next();
-                            switch (opcYN) {
-                                case "Y" -> {
-                                    break;
-                                }
-                                case "n" -> {
-                                    break;
-                                }
-                                default -> {
-                                    Funciones.cls();
-                                    System.out.println("¡ERROR! Ingrese una opción correcta.");
-                                    Funciones.pause();
-                                }
-                            }
-                        } while (!"n".equals(opcYN) && !"Y".equals(opcYN));
-
-                        if("Y".equals(opcYN)){
-                            break;
-                        }
-                    }else{
+                } else {
+                    if (telefono.length() == 10) {
+                        usu.setTelefono(telefono);
+                        break;
+                    } else {
                         Funciones.cls();
                         System.out.println("    ¡ERROR! El telefono ingresado es incorrecto. "
                                 + " Ingrese su teléfono nuevamente.");
                         Funciones.pause();
                     }
                 }
-            }while(true);
-            
+            } while (true);
+
             //Campo - Matrícula
-            do{
+            do {
                 Funciones.cls();
                 System.out.print(titulo);
                 System.out.print("  Ingrese su matrícula: ");
                 String matricula = br.readLine();
-                if(Funciones.isValidCode(matricula) == false){
+                if (Funciones.isValidCode(matricula) == false) {
                     Funciones.cls();
                     System.out.println("    ¡ERROR! No puede ingresar caracteres "
                             + "especiales, ingrese su matrícula nuevamente.");
                     Funciones.pause();
-                }else{
-                    if(estc.existeMatricula(matricula.toUpperCase())){
+                } else {
+                    if (estc.existeMatricula(matricula.toUpperCase())) {
                         Funciones.cls();
-                    System.out.println("""
+                        System.out.println("""
                                            ¡ERROR! Ingrese su matrícula, no puede ingresar la matrícula
                                                                 de otro estudiante.
                                        """);
-                    Funciones.pause();
-                    }else{
-                        String opcYN;
-                        do {
-                            Funciones.cls();
-                            est.setMatricula(matricula.toUpperCase());
-                            System.out.println("La matrícula ingresada es: " + est.getMatricula());
-                            System.out.print("¿Es correcto? [Y/n] ");
-                            opcYN = s.next();
-                            switch (opcYN) {
-                                case "Y" -> {
-                                    break;
-                                }
-                                case "n" -> {
-                                    break;
-                                }
-                                default -> {
-                                    Funciones.cls();
-                                    System.out.println("¡ERROR! Ingrese una opción correcta.");
-                                    Funciones.pause();
-                                }
-                            }
-                        } while (!"n".equals(opcYN) && !"Y".equals(opcYN));
-
-                        if("Y".equals(opcYN)){
-                            break;
-                        }
+                        Funciones.pause();
+                    } else {
+                        est.setMatricula(matricula.toUpperCase());
+                        break;
                     }
                 }
-            }while(true);
-            
+            } while (true);
+
             est.setFinalizoMantenimiento(0);
-            
+
             //Campo - Carrera
-            do{
+            do {
                 ArrayList<Carrera> listadoCarreras = carc.listarCarreras();
                 Funciones.cls();
                 System.out.print(titulo);
                 System.out.print("  Seleccione su carrera: \n");
-                for(Carrera p : listadoCarreras){
-                    System.out.print("   " 
+                for (Carrera p : listadoCarreras) {
+                    System.out.print("   "
                             + p.getIdCarrera() + ". "
                             + p.getNombre() + ".\n");
                 }
                 System.out.print("  Opcion: ");
                 String opcCar = s.next();
-                
-                if(Funciones.isValidNumeric(opcCar)){
+
+                if (Funciones.isValidNumeric(opcCar)) {
                     int a = Integer.parseInt(opcCar);
                     System.out.println(a);
                     Funciones.pause();
-                    if(a > listadoCarreras.size()){
+                    if (a > listadoCarreras.size()) {
                         Funciones.cls();
                         System.out.println("    ¡ERROR! Ingrese una opción correcta.");
                         Funciones.pause();
-                    }else{
-                        for (int i = 0; i < listadoCarreras.size(); i++) {
-                            String x = Integer.toString(i+1);
-                            System.out.println(x);
+                    } else {
+                        for (int i = 1; i <= listadoCarreras.size(); i++) {
+                            String x = Integer.toString(i);
                             Funciones.pause();
-                            if(x.equals(opcCar)){
+                            if (x.equals(opcCar)) {
                                 est.setCarrera(listadoCarreras.get(i));
                             }
                         }
-                        
-                        String opcYN;
-                        do {
-                            Funciones.cls();
-                            System.out.println("La carrera seleccionada es: " + est.getCarrera().getNombre());
-                            System.out.print("¿Es correcto? [Y/n] ");
-                            opcYN = s.next();
-                            switch (opcYN) {
-                                case "Y" -> {
-                                    break;
-                                }
-                                case "n" -> {
-                                    break;
-                                }
-                                default -> {
-                                    Funciones.cls();
-                                    System.out.println("¡ERROR! Ingrese una opción correcta.");
-                                    Funciones.pause();
-                                }
-                            }
-                        } while (!"n".equals(opcYN) && !"Y".equals(opcYN));
-
-                        if("Y".equals(opcYN)){
-                            break;
-                        }
+                        break;
                     }
-                }else{
+                } else {
                     Funciones.cls();
                     System.out.println("    ¡ERROR! Ingrese una opción correcta.");
                     Funciones.pause();
                 }
-            }while(true);
-            
+            } while (true);
+
             //Campo - Nivel Carrera
-            do{
+            do {
                 Funciones.cls();
                 System.out.print(titulo);
                 System.out.print("  Ingrese su nivel de la carrera: ");
                 String nivel = s.next();
-                if(Funciones.isValidNumeric(nivel) == false){
+                if (Funciones.isValidNumeric(nivel) == false) {
                     Funciones.cls();
                     System.out.println("    ¡ERROR! No puede ingresar caracteres "
                             + "especiales o letras, ingrese el nivel nuevamente.");
                     Funciones.pause();
-                }else{
+                } else {
                     int nivelCarrera = Integer.parseInt(nivel);
-                    if(nivelCarrera > 5 || nivelCarrera < 1 ){
+                    if (nivelCarrera > 5 || nivelCarrera < 1) {
                         Funciones.cls();
                         System.out.println("    ¡ERROR! Ingrese un nivel correcto.");
                         Funciones.pause();
-                    }else{
-                        String opcYN;
-                        do {
-                            Funciones.cls();
-                            est.setNivelCarrera(nivelCarrera);
-                            System.out.println("El nivel de carrera ingresado es: " + est.getNivelCarrera());
-                            System.out.print("¿Es correcto? [Y/n] ");
-                            opcYN = s.next();
-                            switch (opcYN) {
-                                case "Y" -> {
-                                    break;
-                                }
-                                case "n" -> {
-                                    break;
-                                }
-                                default -> {
-                                    Funciones.cls();
-                                    System.out.println("¡ERROR! Ingrese una opción correcta.");
-                                    Funciones.pause();
-                                }
-                            }
-                        } while (!"n".equals(opcYN) && !"Y".equals(opcYN));
-
-                        if("Y".equals(opcYN)){
-                            break;
-                        }
+                    } else {
+                        Funciones.cls();
+                        est.setNivelCarrera(nivelCarrera);
+                        break;
                     }
                 }
-            }while(true);
-            
+            } while (true);
+
             //Campo - Clave
-            do{
+            do {
                 Funciones.cls();
                 System.out.print(titulo);
                 System.out.println("""
                                                La contraseña debe ser de 5 a 24 caracteres, puede
                                                    contener caracteres especiales como: ._@#*$%+-
-                                          ¡En caso de olvidar su contraseña, contactese con el administrador!
+                                         ¡En caso de olvidar su contraseña, contactese con el administrador!
                                    """);
                 System.out.print("  Ingrese su clave: ");
                 String clave = br.readLine();
-                if(Funciones.isValidPassword(clave)){
-                    if(clave.length() > 24 || clave.length() < 5){
+                if (Funciones.isValidPassword(clave)) {
+                    if (clave.length() > 24 || clave.length() < 5) {
                         Funciones.cls();
-                        
+
                         System.out.println("""
                                                ¡ERROR! La clave ingresada no cumple con los 
                                                 parametros dados. Ingrese su clave de nuevo.
                                            """);
                         Funciones.pause();
-                    }else{
+                    } else {
                         usu.setClave(clave);
                         break;
                     }
-                }else{
+                } else {
                     Funciones.cls();
                     System.out.println("""
                                            ¡ERROR! La clave ingresada no cumple con los 
@@ -601,17 +398,18 @@ public class MainEstudiante {
                                        """);
                     Funciones.pause();
                 }
-            }while(true);
-            
+            } while (true);
+
             usu.setRol(1);
-            
+
             usuc.crearUsuario(usu);
-            
-            int idPersona = usuc.buscarIdPersona(usu.getCedula());
-            est.setIdPersona(idPersona);
-            
+
+            Funciones.cls();
+            int idUsuario = usuc.buscarIdUsuario(usu.getCedula());
+            est.setIdUsuario(idUsuario);
+
             estc.crearEstudiante(est);
-            
+
             System.out.println(titulo);
             System.out.println("""
                                                      ¡CUENTA REGISTRADA CON EXITO! 
@@ -619,454 +417,30 @@ public class MainEstudiante {
                                """);
             Funciones.pause();
             break;
-        }while(true);
+        } while (true);
     }
-    
-    //Editar información de cuenta
-    public static void editarInfo(Estudiante est) throws IOException{
 
-        InputStream inputStream = System.in;
-        Reader reader = new InputStreamReader(inputStream, "UTF-8");
-        BufferedReader br = new BufferedReader(reader);
-        Scanner s = new Scanner(System.in);
-        
-        EstudianteControlador estc = new EstudianteControlador();
-        CarreraControlador carc = new CarreraControlador();
-        
-        Estudiante estTemp = new Estudiante();
-        
-        String titulo = """
+    //Mostrar información de cuenta
+    public static void mostrarInfo(Estudiante est){
+        Funciones.cls();
+        System.out.println("""
                     --------------------------------------------------
-                                    Editar información
-                    --------------------------------------------------                
-        """;
-        String opc;
-        
-        estTemp.setCedula(est.getCedula());
-        
-        do{
-            //Campo -Nombres
-            do {
-                Funciones.cls();
-                System.out.println("Sus nombres son: " + est.getNombre());
-                System.out.print("¿Desea cambiar sus nombres? [Y/n] ");
-                opc = s.next();
-                switch (opc) {
-                    case "Y" -> {
-                        do{
-                            Funciones.cls();
-                            System.out.print(titulo);
-                            System.out.print("  Ingrese sus nombres: ");
-                            String nombres = s.next();
-                            if(Funciones.isValidText(nombres) == false){
-                                Funciones.cls();
-                                System.out.println("    ¡ERROR! No puede ingresar caracteres "
-                                        + "especiales o números, ingrese su nombres nuevamente.");
-                                Funciones.pause();
-                            }else{
-                                estTemp.setNombre(nombres.toUpperCase());
-                                break;
-                            }
-                        }while(true);
-                        opc = "";
-                        break;
-                    }
-                    case "n" -> {
-                        estTemp.setNombre(est.getNombre());
-                        break;
-                    }
-                    default -> {
-                        Funciones.cls();
-                        System.out.println("¡ERROR! Ingrese una opción correcta.");
-                        Funciones.pause();
-                    }
-                }
-            } while (!"n".equals(opc) && !"Y".equals(opc));
-            
-            //Campo - Apellidos
-            do {
-                Funciones.cls();
-                System.out.println("Sus apellidos son: " + est.getApellido());
-                System.out.print("¿Desea cambiar sus apellidos? [Y/n] ");
-                opc = s.next();
-                switch (opc) {
-                    case "Y" -> {
-                        do{
-                            Funciones.cls();
-                            System.out.print(titulo);
-                            System.out.print("  Ingrese sus apellidos: ");
-                            String apellidos = br.readLine();
-                            if(Funciones.isValidText(apellidos) == false){
-                                Funciones.cls();
-                                System.out.println("    ¡ERROR! No puede ingresar caracteres "
-                                        + "especiales o números, ingrese su apellidos nuevamente.");
-                                Funciones.pause();
-                            }else{
-                                estTemp.setApellido(apellidos.toUpperCase());
-                                break;
-                            }
-                        }while(true);
-                        break;
-                    }
-                    case "n" -> {
-                        estTemp.setApellido(est.getApellido());
-                    }
-                    default -> {
-                        Funciones.cls();
-                        System.out.println("¡ERROR! Ingrese una opción correcta.");
-                        Funciones.pause();
-                        continue;
-                    }
-                }
-            } while (!"n".equals(opc) && !"Y".equals(opc));
-            
-            //Campo - Email
-            do {
-                Funciones.cls();
-                System.out.println("Su email es: " + est.getCorreoElectronico());
-                System.out.print("¿Desea cambiar su email? [Y/n] ");
-                opc = s.next();
-                switch (opc) {
-                    case "Y" -> {
-                        do{
-                            Funciones.cls();
-                            System.out.print(titulo);
-                            System.out.print("  Ingrese su email: ");
-                            String email = br.readLine();
-                            if(Funciones.isValidEmail(email) == false){
-                                Funciones.cls();
-                                System.out.println("    ¡ERROR! El correo eléctronico ingresado "
-                                        + "es incorrecto, ingrese su correo nuevamente.");
-                                Funciones.pause();
-                            }else{
-                                estTemp.setCorreoElectronico(email);
-                                break;
-                            }
-                        }while(true);
-                        break;
-                    }
-                    case "n" -> {
-                        estTemp.setCorreoElectronico(
-                                est.getCorreoElectronico()
-                        );
-                    }
-                    default -> {
-                        Funciones.cls();
-                        System.out.println("¡ERROR! Ingrese una opción correcta.");
-                        Funciones.pause();
-                        continue;
-                    }
-                }
-            } while (!"n".equals(opc) && !"Y".equals(opc));
-            
-            //Campo - Dirección
-            do {
-                Funciones.cls();
-                System.out.println("Su dirección es: " + est.getDireccion());
-                System.out.print("¿Desea cambiar su dirección? [Y/n] ");
-                opc = s.next();
-                switch (opc) {
-                    case "Y" -> {
-                        do{
-                            Funciones.cls();
-                            System.out.print(titulo);
-                            System.out.print("  Ingrese su dirección: ");
-                            String direccion = br.readLine();
-                            if(Funciones.isValidAdress(direccion) == false){
-                                Funciones.cls();
-                                System.out.println("    ¡ERROR! No puede ingresar caracteres "
-                                        + "especiales, ingrese su dirección nuevamente.");
-                                Funciones.pause();
-                            }else{
-                                estTemp.setDireccion(direccion.toUpperCase());
-                                break;
-                            }
-                        }while(true);
-                        break;
-                    }
-                    case "n" -> {
-                        estTemp.setDireccion(est.getDireccion());
-                    }
-                    default -> {
-                        Funciones.cls();
-                        System.out.println("¡ERROR! Ingrese una opción correcta.");
-                        Funciones.pause();
-                        continue;
-                    }
-                }
-            } while (!"n".equals(opc) && !"Y".equals(opc));
-            
-            //Campo - Teléfono
-            do {
-                Funciones.cls();
-                System.out.println("Su teléfono es: " + est.getTelefono());
-                System.out.print("¿Desea cambiar su teléfono? [Y/n] ");
-                opc = s.next();
-                switch (opc) {
-                    case "Y" -> {
-                        do{
-                            Funciones.cls();
-                            System.out.print(titulo);
-                            System.out.print("  Ingrese su teléfono: ");
-                            String telefono = br.readLine();
-                            if(Funciones.isValidNumeric(telefono) == false){
-                                Funciones.cls();
-                                System.out.println("    ¡ERROR! No puede ingresar caracteres "
-                                        + "especiales o letras, ingrese su teléfono nuevamente.");
-                                Funciones.pause();
-                            }else{
-                                if(telefono.length() == 10){
-                                    estTemp.setTelefono(telefono);
-                                    break;
-                                }else{
-                                    Funciones.cls();
-                                    System.out.println("    ¡ERROR! El telefono ingresado es incorrecto. "
-                                            + " Ingrese su teléfono nuevamente.");
-                                    Funciones.pause();
-                                }
-                            }
-                        }while(true);
-                        break;
-                    }
-                    case "n" -> {
-                        estTemp.setTelefono(est.getTelefono());
-                    }
-                    default -> {
-                        Funciones.cls();
-                        System.out.println("¡ERROR! Ingrese una opción correcta.");
-                        Funciones.pause();
-                        continue;
-                    }
-                }
-            } while (!"n".equals(opc) && !"Y".equals(opc));
-            
-            //Campo - Matrícula
-            do {
-                Funciones.cls();
-                System.out.println("Su matrícula es: " + est.getMatricula());
-                System.out.print("¿Desea cambiar su matrícula? [Y/n] ");
-                opc = s.next();
-                switch (opc) {
-                    case "Y" -> {
-                        do{
-                            Funciones.cls();
-                            System.out.print(titulo);
-                            System.out.print("  Ingrese su matrícula: ");
-                            String matricula = br.readLine();
-                            if(Funciones.isValidCode(matricula) == false){
-                                Funciones.cls();
-                                System.out.println("    ¡ERROR! No puede ingresar caracteres "
-                                        + "especiales, ingrese su matrícula nuevamente.");
-                                Funciones.pause();
-                            }else{
-                                if(estc.existeMatricula(matricula.toUpperCase())){
-                                    Funciones.cls();
-                                    System.out.println("""
-                                                           ¡ERROR! Ingrese su matrícula, no puede ingresar la matrícula
-                                                                                de otro estudiante.
-                                                       """);
-                                    Funciones.pause();
-                                }else{
-                                    estTemp.setMatricula(matricula.toUpperCase());
-                                    break;
-                                }
-                            }
-                        }while(true);
-                        break;
-                    }
-                    case "n" -> {
-                        estTemp.setMatricula(est.getMatricula());
-                    }
-                    default -> {
-                        Funciones.cls();
-                        System.out.println("¡ERROR! Ingrese una opción correcta.");
-                        Funciones.pause();
-                        continue;
-                    }
-                }
-            } while (!"n".equals(opc) && !"Y".equals(opc));
-            
-            //Campo - Carrera
-            do {
-                Funciones.cls();
-                System.out.println("Su carrera es: " + est.getCarrera().getNombre());
-                System.out.print("¿Desea cambiar su carrera? [Y/n] ");
-                opc = s.next();
-                switch (opc) {
-                    case "Y" -> {
-                        do{
-                            ArrayList<Carrera> listadoCarreras = carc.listarCarreras();
-                            Funciones.cls();
-                            System.out.print(titulo);
-                            System.out.print("  Seleccione su carrera: \n");
-                            for(Carrera p : listadoCarreras){
-                                System.out.print("   " 
-                                        + p.getIdCarrera() + ". "
-                                        + p.getNombre() + ".\n");
-                            }
-                            System.out.print("  Opcion: ");
-                            String opcCar = s.next();
-
-                            if(Funciones.isValidNumeric(opcCar)){
-                                int a = Integer.parseInt(opcCar);
-                                System.out.println(a);
-                                Funciones.pause();
-                                if(a > listadoCarreras.size()){
-                                    Funciones.cls();
-                                    System.out.println("    ¡ERROR! Ingrese una opción correcta.");
-                                    Funciones.pause();
-                                }else{
-                                    for (int i = 1; i <= listadoCarreras.size(); i++) {
-                                        String x = Integer.toString(i);
-                                        System.out.println(x);
-                                        Funciones.pause();
-                                        if(x.equals(opcCar)){
-                                            estTemp.setCarrera(listadoCarreras.get(i));
-                                        }
-                                    }
-                                    break;
-                                }
-                            }else{
-                                Funciones.cls();
-                                System.out.println("    ¡ERROR! Ingrese una opción correcta.");
-                                Funciones.pause();
-                            }
-                        }while(true);
-                        break;
-                    }
-                    case "n" -> {
-                        estTemp.setCarrera(est.getCarrera());
-                    }
-                    default -> {
-                        Funciones.cls();
-                        System.out.println("¡ERROR! Ingrese una opción correcta.");
-                        Funciones.pause();
-                        continue;
-                    }
-                }
-            } while (!"n".equals(opc) && !"Y".equals(opc));
-            
-            //Campo - Nivel Carrera
-            do {
-                Funciones.cls();
-                System.out.println("Su nivel de carrera es: " + est.getNivelCarrera());
-                System.out.print("¿Desea cambiar su nivel? [Y/n] ");
-                opc = s.next();
-                switch (opc) {
-                    case "Y" -> {
-                        do{
-                            Funciones.cls();
-                            System.out.print(titulo);
-                            System.out.print("  Ingrese su nivel de la carrera: ");
-                            String nivel = s.next();
-                            if(Funciones.isValidNumeric(nivel) == false){
-                                Funciones.cls();
-                                System.out.println("    ¡ERROR! No puede ingresar caracteres "
-                                        + "especiales o letras, ingrese el nivel nuevamente.");
-                                Funciones.pause();
-                            }else{
-                                int nivelCarrera = Integer.parseInt(nivel);
-                                if(nivelCarrera > 5 || nivelCarrera < 1 ){
-                                    Funciones.cls();
-                                    System.out.println("    ¡ERROR! Ingrese un nivel correcto.");
-                                    Funciones.pause();
-                                }else{
-                                    estTemp.setNivelCarrera(nivelCarrera);
-                                    break;
-                                }
-                            }
-                        }while(true);
-                        break;
-                    }
-                    case "n" -> {
-                        estTemp.setNivelCarrera(est.getNivelCarrera());
-                    }
-                    default -> {
-                        Funciones.cls();
-                        System.out.println("¡ERROR! Ingrese una opción correcta.");
-                        Funciones.pause();
-                        continue;
-                    }
-                }
-            } while (!"n".equals(opc) && !"Y".equals(opc));
-            
-            //Campo - Clave
-            do {
-                Funciones.cls();
-                System.out.print("¿Desea cambiar su contraseña? [Y/n] ");
-                opc = s.next();
-                switch (opc) {
-                    case "Y" -> {
-                        do{
-                            Funciones.cls();
-                            System.out.print(titulo);
-                            System.out.println("""
-                                                           La contraseña debe ser de 5 a 24 caracteres, puede
-                                                               contener caracteres especiales como: ._@#*$%+-
-                                                      ¡En caso de olvidar su contraseña, contactese con el administrador!
-                                               """);
-                            System.out.print("  Ingrese su clave: ");
-                            String clave = br.readLine();
-                            if(Funciones.isValidPassword(clave)){
-                                if(clave.length() > 24 || clave.length() < 5){
-                                    Funciones.cls();
-
-                                    System.out.println("""
-                                                           ¡ERROR! La clave ingresada no cumple con los 
-                                                            parametros dados. Ingrese su clave de nuevo.
-                                                       """);
-                                    Funciones.pause();
-                                }else{
-                                    estTemp.setClave(clave);
-                                    break;
-                                }
-                            }else{
-                                Funciones.cls();
-                                System.out.println("""
-                                                       ¡ERROR! La clave ingresada no cumple con los 
-                                                        parametros dados. Ingrese su clave de nuevo.
-                                                   """);
-                                Funciones.pause();
-                            }
-                        }while(true);
-                        break;
-                    }
-                    case "n" -> {
-                        estTemp.setClave(est.getClave());
-                        break;
-                    }
-                    default -> {
-                        Funciones.cls();
-                        System.out.println("¡ERROR! Ingrese una opción correcta.");
-                        Funciones.pause();
-                        continue;
-                    }
-                }
-            } while (!"n".equals(opc) && !"Y".equals(opc));
-            
-            Funciones.cls();
-            estc.actualizarEstudiante(estTemp, est.getMatricula());
-            
-            System.out.println(titulo);
-            System.out.println("""
-                                                      ¡DATOS CAMBIADOS CON ÉXITO! 
-                                    Sus datos fueron cambiados con éxito, no comparta esta información
-                                                               con nadie
-                               """);
-            Funciones.pause();
-            break;
-        }while(true);
-    
+                                   Información Personal                  
+                    --------------------------------------------------
+        """);
+        System.out.println(est.toString());
+        System.out.println("            --------------------------------------------------");
+        Funciones.pause();
     }
     
     //Menú - Sin laboratorio asignado
-    public static int subMenu1(Estudiante estudiante) throws IOException{
+    public static int subMenu1(Estudiante estudiante) throws IOException {
         InputStream inputStream = System.in;
         Reader reader = new InputStreamReader(inputStream, "UTF-8");
         BufferedReader br = new BufferedReader(reader);
         Scanner s = new Scanner(System.in);
-        
-        do{
+
+        do {
             Funciones.cls();
             System.out.println("""
                     --------------------------------------------------
@@ -1088,9 +462,10 @@ public class MainEstudiante {
             String opc = s.next();
             switch (opc) {
                 case "1" -> {
+                    mostrarInfo(estudiante);
                 }
                 case "2" -> {
-                    editarInfo(estudiante);
+                    estudiante.editarDatosPersonales();
                 }
                 case "3" -> {
                     Funciones.cls();
@@ -1111,23 +486,24 @@ public class MainEstudiante {
                     break;
                 }
             }
-        }while(true);
+        } while (true);
     }
-    
+
     public static void main(String[] args) throws IOException {
         Estudiante est = logeoEstudiante();
-        if(est != null){
-            do{
+        if (est != null) {
+            do {
                 EstudianteControlador estC = new EstudianteControlador();
+                Estudiante estTemp = est;
                 est = estC.buscarEstudiante(est.getCedula());
-                if(est.getFinalizoMantenimiento() == 0){
-                    int flag = subMenu1(est);
-                    if(flag == 1){
+                if (est.getFinalizoMantenimiento() == 0) {
+                    int flag = subMenu1(estTemp);
+                    if (flag == 1) {
                         main(args);
                         break;
                     }
                 }
-            }while(true);
+            } while (true);
         }
     }
 }

@@ -24,7 +24,7 @@ public class ConexionBDD {
         } catch (ClassNotFoundException | SQLException e)//CAPTURAR ERRORES 
         {
              System.out.println("¡ERROR EN EL SISTEMA! COMUNIQUESE CON EL ADMINISTRADOR\n"
-                     + "PARA SOLUCIONAR SU PROBLEMA.");
+                     + "PARA SOLUCIONAR SU PROBLEMA: " + e);
         }
         return conexion;
     }

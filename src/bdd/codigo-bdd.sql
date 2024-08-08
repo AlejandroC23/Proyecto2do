@@ -20,10 +20,15 @@ CREATE TABLE Encargados (
 
 CREATE TABLE Laboratorios (
     lab_id INT AUTO_INCREMENT PRIMARY KEY,
-    lab_nombre VARCHAR(50) NOT NULL UNIQUE,
+    lab_nombre VARCHAR(150) NOT NULL UNIQUE,
     lab_edificio INT NOT NULL,
-    enc_id INT NOT NULL,
-    FOREIGN KEY (enc_id) REFERENCES Encargados(enc_id)
+    lab_ciudad VARCHAR(75) NOT NULL,
+    enc_id INT
+);
+
+CREATE TABLE Carreras (
+    car_id INT AUTO_INCREMENT PRIMARY KEY,
+    car_obj VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE Estudiantes (
@@ -37,16 +42,11 @@ CREATE TABLE Estudiantes (
     FOREIGN KEY (car_id) REFERENCES Carreras(car_id)
 );
 
-CREATE TABLE Carreras (
-    car_id INT AUTO_INCREMENT PRIMARY KEY,
-    car_obj VARCHAR(100) NOT NULL
-);
-
 CREATE TABLE Mantenimientos (
     mant_id INT AUTO_INCREMENT PRIMARY KEY,
     mant_fechaini DATE NOT NULL,
-    mant_fechafin DATE NOT NULL,
-    lab_id INT NOT NULL,
+    mant_fechafin DATE,
+    lab_id INT,
     FOREIGN KEY (lab_id) REFERENCES Laboratorios(lab_id)
 );
 
