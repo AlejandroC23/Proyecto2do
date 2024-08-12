@@ -148,6 +148,82 @@ public class EncargadoControlador {
         return enc;
     }
     
+    public int buscarIdEncargado(String cedula) {
+        Encargado enc = new Encargado();
+        try {
+            String consulta = "SELECT enc_id "
+                    + "FROM encargados e, usuarios u, laboratorios l "
+                    + "WHERE e.usu_id = u.usu_id "
+                    + "AND usu_cedula = '" + cedula + "' "
+                    + "AND usu_rol = 2;";
+            ejecutar = (PreparedStatement) connection.prepareCall(consulta);
+            
+            resultado = ejecutar.executeQuery(consulta);
+            
+            if (resultado.next()) {
+                int idEncargado = resultado.getInt("enc_id");
+                consulta = "SELECT lab_id "
+                    + "FROM encargados e, laboratorios l "
+                    + "WHERE e.enc_id = l.enc_id "
+                    + "AND e.enc_id = " + idEncargado;
+                ejecutar = (PreparedStatement) connection.prepareCall(consulta);
+            
+                resultado = ejecutar.executeQuery(consulta);
+                if(resultado.next()){
+                    ejecutar.close();
+                    return 0;
+                }else{
+                    ejecutar.close();
+                    return idEncargado;
+                }
+            } else {
+                ejecutar.close();
+                return 0;
+            }
+        } catch (Exception e) {
+            System.out.println("¡ERROR EN EL SISTEMA! COMUNIQUESE CON EL ADMINISTRADOR\n"
+                    + "PARA SOLUCIONAR SU PROBLEMA: " + e);
+        }
+        return 0;
+    }
+    
+    public Encargado buscarEncargado(int idEncargado) {
+        Encargado enc = new Encargado();
+        try {
+            String consulta = "SELECT usu_cedula, usu_nombre, usu_apellido, usu_telefono, usu_correoElectronico, usu_direccion, usu_rol, usu_clave, enc_titulo, enc_cargo "
+                    + "FROM encargados e, usuarios u "
+                    + "WHERE e.usu_id = u.usu_id "
+                    + "AND enc_id = " + idEncargado + " "
+                    + "AND usu_rol = 2;";
+            ejecutar = (PreparedStatement) connection.prepareCall(consulta);
+            
+            resultado = ejecutar.executeQuery(consulta);
+            
+            if (resultado.next()) {
+                enc.setNombre(resultado.getString("usu_nombre"));
+                enc.setApellido(resultado.getString("usu_apellido"));
+                enc.setCorreoElectronico(resultado.getString("usu_correoElectronico"));
+                enc.setDireccion(resultado.getString("usu_direccion"));
+                enc.setTelefono(resultado.getString("usu_telefono"));
+                enc.setCedula(resultado.getString("usu_cedula"));
+                enc.setClave(resultado.getString("usu_clave"));
+                enc.setRol(resultado.getInt("usu_rol"));
+                enc.setTitulo(resultado.getString("enc_titulo"));
+                enc.setCargo(resultado.getString("enc_cargo"));
+                ejecutar.close();
+                return enc;
+            } else {
+                enc.setCedula("0");
+            }
+            ejecutar.close();
+            return enc;
+        } catch (Exception e) {
+            System.out.println("¡ERROR EN EL SISTEMA! COMUNIQUESE CON EL ADMINISTRADOR\n"
+                    + "PARA SOLUCIONAR SU PROBLEMA: " + e);
+        }
+        return enc;
+    }
+    
     public void actualizarEncargado(Encargado enc, String titulo){
         try {
             String consulta = "UPDATE usuarios SET "
@@ -194,6 +270,67 @@ public class EncargadoControlador {
                 ejecutar.close();
             }
         } catch (Exception e) {
+            System.out.println("¡ERROR EN EL SISTEMA! COMUNIQUESE CON EL ADMINISTRADOR\n"
+                     + "PARA SOLUCIONAR SU PROBLEMA: " + e);
+        }
+    }
+    
+    public void cambiarClave(String cedula, String clave){
+        try {
+            String consulta = "UPDATE usuarios SET "
+                    + "usu_clave = ? "
+                    + "WHERE usu_cedula = ?;";
+            
+            ejecutar =(PreparedStatement) connection.prepareCall(consulta);
+            ejecutar.setString(1, clave);
+            ejecutar.setString(2, cedula);
+            
+            int res = ejecutar.executeUpdate();
+            
+            if(res > 0){
+                ejecutar.close();
+            }else{
+                ejecutar.close();
+            }
+            
+        } catch(Exception e){
+            System.out.println("¡ERROR EN EL SISTEMA! COMUNIQUESE CON EL ADMINISTRADOR\n"
+                     + "PARA SOLUCIONAR SU PROBLEMA: " + e);
+        }
+    }
+    
+    public void crearEnc(String cedula, String clave){
+        try {
+            String consulta = "INSERT INTO usuarios(usu_nombre, "
+                    + "usu_apellido, "
+                    + "usu_cedula, "
+                    + "usu_clave, "
+                    + "usu_telefono, "
+                    + "usu_correoElectronico, "
+                    + "usu_direccion, "
+                    + "usu_rol)"
+                    + "VALUES ('.', "
+                    + "'.', "
+                    + "?, "
+                    + "?, "
+                    + "'0', "
+                    + "'.', "
+                    + "'.', "
+                    + "2);";
+            
+            ejecutar =(PreparedStatement) connection.prepareCall(consulta);
+            ejecutar.setString(1, cedula);
+            ejecutar.setString(2, clave);
+            
+            int res = ejecutar.executeUpdate();
+            
+            if(res > 0){
+                ejecutar.close();
+            }else{
+                ejecutar.close();
+            }
+            
+        } catch(Exception e){
             System.out.println("¡ERROR EN EL SISTEMA! COMUNIQUESE CON EL ADMINISTRADOR\n"
                      + "PARA SOLUCIONAR SU PROBLEMA: " + e);
         }

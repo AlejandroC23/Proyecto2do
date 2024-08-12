@@ -5,6 +5,7 @@
 package modelo;
 
 import controlador.EncargadoControlador;
+import controlador.EstudianteControlador;
 import controlador.Funciones;
 import controlador.LaboratorioControlador;
 import controlador.MantenimientoControlador;
@@ -91,12 +92,89 @@ public class Encargado extends Usuario {
         mantC.crearMantenimiento(idLaboratorio);
     }
     
-    public void finalizarMantenimiento(){
+    public boolean finalizarMantenimiento(){
+        Scanner s = new Scanner(System.in);
         
-    }
-    
-    public void verificarMantenimiento(){
+        LaboratorioControlador labC = new LaboratorioControlador();
+        Laboratorio lab = labC.buscarLaboratorio(getCedula());
+        lab.setIdLaboratorio(labC.buscarIdLaboratorio(getCedula()));
         
+        MantenimientoControlador mantC = new MantenimientoControlador();
+        Mantenimiento mant = mantC.buscarMantenimiento(lab);
+        
+        boolean finalizaronMant = true;
+        String opcYN;
+        
+        if(mant.getEstudiantes().isEmpty() == false){
+            for(Estudiante p : mant.getEstudiantes()){
+                if(p.isFinalizoMantenimiento() == false){
+                    finalizaronMant = false;
+                }
+            }
+
+            if(finalizaronMant){
+                do{
+                    Funciones.cls();
+                    System.out.println("¿Desea finalizar el mantenimiento? [Y/n] ");
+                    opcYN = s.next();
+                    switch(opcYN){
+                        case "Y" -> {
+                            do{
+                                Funciones.cls();
+                                System.out.println("¿Está seguro? [Y/n] ");
+                                opcYN = s.next();
+                                switch(opcYN){
+                                    case "Y" -> {
+                                        EstudianteControlador estC = new EstudianteControlador();
+                                        for(Estudiante p : mant.getEstudiantes()){
+                                            estC.actualizarEstudianteMantenimiento(p.getMatricula(), false);
+                                        }
+                                        mantC.editarMantenimiento(mant.getIdMantenimiento());
+                                        return finalizaronMant;
+                                    }
+                                    case "n" -> {
+                                        Funciones.cls();
+                                        System.out.println("Regresando...");
+                                        Funciones.pause();
+                                        return false;
+                                    }
+                                    default -> {
+                                        Funciones.cls();
+                                        System.out.println("¡ERROR! Ingrese una opción correcta.");
+                                        Funciones.pause();
+                                    }
+                                }
+                            }while(!"Y".equals(opcYN) && !"n".equals(opcYN));
+                        }
+                        case "n" -> {
+                            Funciones.cls();
+                            System.out.println("Regresando...");
+                            Funciones.pause();
+                            return false;
+                        }
+                        default -> {
+                            Funciones.cls();
+                            System.out.println("¡ERROR! Ingrese una opción correcta.");
+                            Funciones.pause();
+                        }
+                    }
+                }while(!"Y".equals(opcYN) && !"n".equals(opcYN));
+            }else{
+                Funciones.cls();
+                System.out.println("""
+                                   ¡No puede finalizar el mantenimiento al laboratorio! 
+                                   Algunos estudiantes aún no han finalizado el mantenimiento, asegurese que todos
+                                   los estudiantes hayan finalizado el mantenimiento.
+                                   """);
+                Funciones.pause();
+                return finalizaronMant;
+            }
+        }else{
+            Funciones.cls();
+            System.out.println("¡ERROR! Aún no ha asignado estudiantes al mantemiento.");
+            Funciones.pause();
+        }
+        return finalizaronMant;
     }
     
     public void editarDatosPersonales() throws IOException {

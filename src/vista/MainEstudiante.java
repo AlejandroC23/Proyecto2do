@@ -6,7 +6,10 @@ package vista;
 
 import controlador.Funciones;
 import controlador.CarreraControlador;
+import controlador.ComputadoraControlador;
 import controlador.EstudianteControlador;
+import controlador.LaboratorioControlador;
+import controlador.MantenimientoControlador;
 import controlador.UsuarioControlador;
 import java.util.Scanner;
 import modelo.Estudiante;
@@ -18,6 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import modelo.Carrera;
+import modelo.Computadora;
+import modelo.Laboratorio;
+import modelo.Mantenimiento;
 
 /**
  *
@@ -36,7 +42,7 @@ public class MainEstudiante {
             3. Contactarse con un administrador
             4. Regresar
         -------------------------------------------
-        """.indent(30));
+        """.indent(10));
         System.out.print("  Opcion: ");
     }
 
@@ -51,25 +57,39 @@ public class MainEstudiante {
             Funciones.cls();
             menuLogeoEstudiante();
             opcEst = s.next();
-
+            
             switch (opcEst) {
                 //Inicio de sesión
                 case "1" -> {
                     do {
                         Funciones.cls();
                         est = inicioSesion();
+                        String opcYN;
                         if ("0".equals(est.getCedula())) {
-                            Funciones.cls();
-                            System.out.println("Usuario o contraseña incorrecto...\n");
-                            System.out.print("¿Desea regresar al menú anterior? [Y/n] ");
-                            String opcYN = s.next();
+                            do {
+                                Funciones.cls();
+                                System.out.println("Usuario o contraseña incorrecto...\n");
+                                System.out.print("¿Desea regresar al menú anterior? [Y/n] ");
+                                opcYN = s.next();
+                                switch (opcYN) {
+                                    case "Y" -> {
+                                        break;
+                                    }
+                                    case "n" -> {
+                                        break;
+                                    }
+                                    default -> {
+                                        Funciones.cls();
+                                        System.out.println("¡ERROR! Ingrese una opción correcta.");
+                                        Funciones.pause();
+                                        continue;
+                                    }
+                                }
+                                break;
+                            } while (true);
+                            
                             if ("Y".equals(opcYN)) {
                                 break;
-                            } else if ("n".equals(opcYN)) {
-                            } else {
-                                Funciones.cls();
-                                System.out.println("¡ERROR! Ingrese una opción correcta.");
-                                Funciones.pause();
                             }
                         } else {
                             return est;
@@ -83,9 +103,20 @@ public class MainEstudiante {
                     registro();
                     break;
                 }
-                //Regresar
                 case "3" -> {
-                    continue;
+                    Funciones.cls();
+                    System.out.println("""
+                                                    Si presenta errores con el sistema contactese
+                                                            a los siguientes números:
+                                       
+                                                             0995196339 - 0995113268
+                                       
+                                                  En caso de no recibir respuesta puede contactarse
+                                                          al siguiente correo electrónico:
+                                                    
+                                                     alejandro.cevallos919@ist17dejulio.edu.ec
+                                       """);
+                    Funciones.pause();
                 }
                 case "4" -> {
                     System.out.println("Regresando...");
@@ -97,7 +128,7 @@ public class MainEstudiante {
                     Funciones.pause();
                 }
             }
-        } while (!"3".equals(opcEst));
+        } while (!"4".equals(opcEst));
         return est;
     }
 
@@ -105,11 +136,11 @@ public class MainEstudiante {
     public static Estudiante inicioSesion() throws IOException {
         EstudianteControlador estC = new EstudianteControlador();
         Estudiante est = new Estudiante();
-
+        
         InputStream inputStream = System.in;
         Reader reader = new InputStreamReader(inputStream, "UTF-8");
         BufferedReader br = new BufferedReader(reader);
-
+        
         Scanner s = new Scanner(System.in);
         System.out.println("""
                     --------------------------------------
@@ -120,13 +151,13 @@ public class MainEstudiante {
         String usuario = br.readLine();
         System.out.print("     Clave: ");
         String clave = br.readLine();
-
+        
         if (Funciones.isValidNumeric(usuario) && Funciones.isValidPassword(clave)) {
             est = estC.buscarEstudiante(usuario, clave);
         } else {
             est.setCedula("0");
         }
-
+        
         return est;
     }
 
@@ -136,11 +167,11 @@ public class MainEstudiante {
         Reader reader = new InputStreamReader(inputStream, "UTF-8");
         BufferedReader br = new BufferedReader(reader);
         Scanner s = new Scanner(System.in);
-
+        
         EstudianteControlador estc = new EstudianteControlador();
         UsuarioControlador usuc = new UsuarioControlador();
         CarreraControlador carc = new CarreraControlador();
-
+        
         Usuario usu = new Usuario();
         Estudiante est = new Estudiante();
         String titulo = """
@@ -148,7 +179,7 @@ public class MainEstudiante {
                                       Registro Cuenta
                     --------------------------------------------------                
         """;
-
+        
         do {
             //Campo - Cédula
             do {
@@ -162,7 +193,7 @@ public class MainEstudiante {
                         Funciones.cls();
                         System.out.println("""
                                             ¡ERROR! Ya existe una cuenta registrada en el sistema con esta cédula
-                                            En caso de haber olvidado la clave. Contactese con el administrador.
+                                             En caso de haber olvidado la clave. Contactese con el administrador.
                                            """);
                         Funciones.pause();
                         main(null);
@@ -299,8 +330,8 @@ public class MainEstudiante {
                     }
                 }
             } while (true);
-
-            est.setFinalizoMantenimiento(0);
+            
+            est.setFinalizoMantenimiento(false);
 
             //Campo - Carrera
             do {
@@ -315,11 +346,9 @@ public class MainEstudiante {
                 }
                 System.out.print("  Opcion: ");
                 String opcCar = s.next();
-
+                
                 if (Funciones.isValidNumeric(opcCar)) {
                     int a = Integer.parseInt(opcCar);
-                    System.out.println(a);
-                    Funciones.pause();
                     if (a > listadoCarreras.size()) {
                         Funciones.cls();
                         System.out.println("    ¡ERROR! Ingrese una opción correcta.");
@@ -327,9 +356,8 @@ public class MainEstudiante {
                     } else {
                         for (int i = 1; i <= listadoCarreras.size(); i++) {
                             String x = Integer.toString(i);
-                            Funciones.pause();
                             if (x.equals(opcCar)) {
-                                est.setCarrera(listadoCarreras.get(i));
+                                est.setCarrera(listadoCarreras.get(i - 1));
                             }
                         }
                         break;
@@ -380,7 +408,7 @@ public class MainEstudiante {
                 if (Funciones.isValidPassword(clave)) {
                     if (clave.length() > 24 || clave.length() < 5) {
                         Funciones.cls();
-
+                        
                         System.out.println("""
                                                ¡ERROR! La clave ingresada no cumple con los 
                                                 parametros dados. Ingrese su clave de nuevo.
@@ -399,17 +427,17 @@ public class MainEstudiante {
                     Funciones.pause();
                 }
             } while (true);
-
+            
             usu.setRol(1);
-
+            
             usuc.crearUsuario(usu);
-
+            
             Funciones.cls();
             int idUsuario = usuc.buscarIdUsuario(usu.getCedula());
             est.setIdUsuario(idUsuario);
-
+            
             estc.crearEstudiante(est);
-
+            
             System.out.println(titulo);
             System.out.println("""
                                                      ¡CUENTA REGISTRADA CON EXITO! 
@@ -421,7 +449,7 @@ public class MainEstudiante {
     }
 
     //Mostrar información de cuenta
-    public static void mostrarInfo(Estudiante est){
+    public static void mostrarInfo(Estudiante est) {
         Funciones.cls();
         System.out.println("""
                     --------------------------------------------------
@@ -432,30 +460,412 @@ public class MainEstudiante {
         System.out.println("            --------------------------------------------------");
         Funciones.pause();
     }
-    
-    //Menú - Sin laboratorio asignado
-    public static int subMenu1(Estudiante estudiante) throws IOException {
+
+    //Mantenimientos de computadoras o registro
+    public static void mantComputadoras(Estudiante est) throws IOException {
+        Scanner s = new Scanner(System.in);
+        
+        MantenimientoControlador mantC = new MantenimientoControlador();
+        Mantenimiento mant = mantC.buscarMantenimientoEstudiante(est.getIdEstudiante());
+        
+        LaboratorioControlador labC = new LaboratorioControlador();
+        Laboratorio lab = mant.getLaboratorio();
+        
+        if (lab.getComputadoras().isEmpty()) {
+            
+            String opc;
+            do {
+                Funciones.cls();
+                System.out.println("No existen computadoras registradas al laboratorio. Registre una computadora.");
+                System.out.print("Ingrese 'r' para regresar o 'i' para ingresar una computadora: ");
+                opc = s.next();
+                switch (opc) {
+                    case "r" -> {
+                        break;
+                    }
+                    case "i" -> {
+                        est.registrarComputadora(lab);
+                        break;
+                    }
+                    default -> {
+                        Funciones.cls();
+                        System.out.println("¡ERROR! Ingrese una opción correcta.");
+                        Funciones.pause();
+                    }
+                }
+            } while (true);
+        } else {
+            Funciones.cls();
+            System.out.println("""
+                                ------------------------------------------------
+                                                  Introducción                  
+                                ------------------------------------------------
+                                  Bienvenido/a al apartado de mantenimiento de
+                                   computadoras, a continuación se presentará
+                                        un listado de computadoras en el
+                                                  laboratorio.
+                               
+                                 Para regresar al menú anterior puede ingresar
+                                   la letra 'r'. Si desea hacer mantenimiento
+                                    a un computador, ingrese 'b' y digite el
+                                      código del computador que necesite.
+                               
+                                  Si el computador no aparece, digite 'i' para
+                                  registrar la computadora y su mantenimiento.
+                               
+                                             Gracias por leer :)
+                                ------------------------------------------------
+                    """);
+            Funciones.pause();
+            String opc = "1";
+            String pag = "1";
+            
+            int finPag;
+            
+            if (lab.getComputadoras().size() < 25) {
+                finPag = 1;
+            } else {
+                finPag = (int) Math.ceil(lab.getComputadoras().size() / 25);
+            }
+            
+            
+            do {
+                if (Funciones.isValidNumeric(opc)) {
+                    int a = Integer.parseInt(opc);
+                    if (a <= finPag) {
+                        pag = opc;
+                        int x = a * 25;
+                        System.out.println(String.format("""
+                                                  --------------------------------------------------------------------
+                                                    Información de Computadoras  - %s
+                                                  --------------------------------------------------------------------
+                                                 |      Codigo      |             Marca            |      Estado      |
+                                            """, lab.getNombre()));
+                        if (a == finPag) {
+                            for (int i = (x - 25); i < lab.getComputadoras().size(); i++) {
+                                System.out.println(lab.getComputadoras().get(i).infoBasica());
+                            }
+                        } else {
+                            for (int i = (x - 25); i < x; i++) {
+                                System.out.println(lab.getComputadoras().get(i).infoBasica());
+                            }
+                        }
+                        System.out.println("      --------------------------------------------------------------------");
+                        System.out.println("                                                        Página. " + a);
+                        System.out.print("     Ingrese 'r' para regresar, 'b' para buscar o 'i' para registar. \n");
+                        System.out.print("     Ingrese el número de página u opción que desea: ");
+                        opc = s.next();
+                    } else {
+                        Funciones.cls();
+                        opc = pag;
+                        System.out.println("¡ERROR! Ingrese una opción correcta.");
+                        Funciones.pause();
+                        continue;
+                    }
+                } else if ("b".equals(opc)) {
+                    String buscarComp;
+                    opc = "1";
+                    do {
+                        Funciones.cls();
+                        System.out.print("Ingrese r para regresar a visualizar las computadoras.\n");
+                        System.out.print("Ingrese el código de computadora a buscar: ");
+                        buscarComp = s.next();
+                        if (!"r".equals(buscarComp)) {
+                            if (Funciones.isValidCode(buscarComp)) {
+                                ComputadoraControlador compC = new ComputadoraControlador();
+                                Computadora comp = compC.
+                                        buscarComputadoraLaboratorio(
+                                                lab.getIdLaboratorio(),
+                                                buscarComp);
+                                if (comp.getIdComputadora() != 0) {
+                                    if (comp.isMantRealizado() == false) {
+                                        String opcYN;
+                                        do {
+                                            Funciones.cls();
+                                            System.out.print(String.format("¿Quiere hacer mantenimiento a la computadora %s? [Y/n] ",
+                                                    comp.getCodigo()));
+                                            opcYN = s.next();
+                                            switch (opcYN) {
+                                                case "Y" -> {
+                                                    est.realizarMantenimiento(comp, mant);
+                                                    break;
+                                                }
+                                                case "n" -> {
+                                                    Funciones.cls();
+                                                    System.out.println("Regresando...");
+                                                    Funciones.pause();
+                                                    continue;
+                                                }
+                                                default -> {
+                                                    Funciones.cls();
+                                                    System.out.println("¡ERROR! Ingrese una opción correcta.");
+                                                    Funciones.pause();
+                                                }
+                                            }
+                                        } while (!"Y".equals(opcYN) && !"n".equals(opcYN));
+                                    } else {
+                                        Funciones.cls();
+                                        System.out.println("""
+                                                           La computadora ingresada ya se ha realizado mantenimiento.
+                                                           Ingrese el código otra computadora. 
+                                                           """);
+                                        Funciones.pause();
+                                    }
+                                } else {
+                                    Funciones.cls();
+                                    System.out.println("¡ERROR! No se encontró la computadora, ingrese el código nuevamente.");
+                                    Funciones.pause();
+                                }
+                            } else {
+                                Funciones.cls();
+                                System.out.println("¡ERROR! Ingrese un código correcto.");
+                                Funciones.pause();
+                            }
+                        } else if ("r".equals(buscarComp)) {
+                            Funciones.cls();
+                            System.out.println("Regresando...");
+                            Funciones.pause();
+                        } else {
+                            Funciones.cls();
+                            opc = pag;
+                            System.out.println("¡ERROR! Ingrese una opción correcta.");
+                            Funciones.pause();
+                        }
+                    } while (!"r".equals(buscarComp));
+                    
+                } else if ("r".equals(opc)) {
+                    Funciones.cls();
+                    opc = pag;
+                    System.out.println("Regresando...");
+                    Funciones.pause();
+                    break;
+                } else if ("i".equals(opc)) {
+                    est.registrarComputadora(lab);
+                    opc = pag;
+                } else {
+                    Funciones.cls();
+                    opc = pag;
+                    System.out.println("¡ERROR! Ingrese una opción correcta.");
+                    Funciones.pause();
+                    continue;
+                }
+                
+            } while (!"r".equals(pag));
+        }
+    }
+
+    //Imprimir computadoras
+    public static void infoComputadoras(Estudiante est) {
+        Scanner s = new Scanner(System.in);
+        
+        MantenimientoControlador mantC = new MantenimientoControlador();
+        Mantenimiento mant = mantC.buscarMantenimientoEstudiante(est.getIdEstudiante());
+        
+        LaboratorioControlador labC = new LaboratorioControlador();
+        Laboratorio lab = mant.getLaboratorio();
+        
+        if (lab.getComputadoras().isEmpty()) {
+            Funciones.cls();
+            System.out.println("No existen computadoras registradas al laboratorio. Intentelo de nuevo más tarde.");
+            Funciones.pause();
+        } else {
+            Funciones.cls();
+            System.out.println("""
+                                ------------------------------------------------
+                                                  Introducción                  
+                                ------------------------------------------------
+                                   Bienvenido/a al apartado de información de
+                                   computadoras, a continuación se presentará
+                                      un listado de las computadoras en el
+                                                  laboratorio.
+                               
+                                 Para regresar al menú anterior puede ingresar
+                                 la letra 'r'. Si desea conocer más información
+                                   de un computador, ingrese 'b' y digite el
+                                      código del computador que necesite.
+                                             Gracias por leer :)
+                                ------------------------------------------------
+                               """);
+            Funciones.pause();
+            String opc = "1";
+            String pag = "1";
+            
+            int finPag;
+            
+            if (lab.getComputadoras().size() < 25) {
+                finPag = 1;
+            } else {
+                finPag = (int) Math.ceil(lab.getComputadoras().size() / 25);
+            }
+            
+            do {
+                if (Funciones.isValidNumeric(opc)) {
+                    int a = Integer.parseInt(opc);
+                    if (a <= finPag) {
+                        pag = opc;
+                        int x = a * 25;
+                        System.out.println(String.format("""
+                                                  --------------------------------------------------------------------
+                                                    Información de Computadoras  - %s
+                                                  --------------------------------------------------------------------
+                                                 |      Codigo      |             Marca            |      Estado      |
+                                            """, lab.getNombre()));
+                        if (a == finPag) {
+                            for (int i = (x - 25); i < lab.getComputadoras().size(); i++) {
+                                System.out.println(lab.getComputadoras().get(i).infoBasica());
+                            }
+                        } else {
+                            for (int i = (x - 25); i < x; i++) {
+                                System.out.println(lab.getComputadoras().get(i).infoBasica());
+                            }
+                        }
+                        System.out.println("      --------------------------------------------------------------------");
+                        System.out.println("                                                        Página. " + a);
+                        System.out.print("     Ingrese 'r' para regresar o 'b' para buscar. \n");
+                        System.out.print("     Ingrese el número de página u opción que desea: ");
+                        opc = s.next();
+                    } else {
+                        Funciones.cls();
+                        opc = pag;
+                        System.out.println("¡ERROR! Ingrese una opción correcta.");
+                        Funciones.pause();
+                        continue;
+                    }
+                } else if ("b".equals(opc)) {
+                    String buscarComp;
+                    opc = "1";
+                    do {
+                        Funciones.cls();
+                        System.out.print("Ingrese r para regresar a visualizar las computadoras.\n");
+                        System.out.print("Ingrese el código de computadora a buscar: ");
+                        buscarComp = s.next();
+                        if (!"r".equals(buscarComp)) {
+                            if (Funciones.isValidCode(buscarComp)) {
+                                ComputadoraControlador compC = new ComputadoraControlador();
+                                Computadora comp = compC.
+                                        buscarComputadoraLaboratorio(
+                                                lab.getIdLaboratorio(),
+                                                buscarComp);
+                                if (comp.getIdComputadora() != 0) {
+                                    Funciones.cls();
+                                    System.out.println(comp.toString());
+                                    Funciones.pause();
+                                } else {
+                                    Funciones.cls();
+                                    System.out.println("¡ERROR! No se encontró la computadora, ingrese el código nuevamente.");
+                                    Funciones.pause();
+                                }
+                            } else {
+                                Funciones.cls();
+                                System.out.println("¡ERROR! Ingrese una opción correcta.");
+                                Funciones.pause();
+                            }
+                        } else {
+                            Funciones.cls();
+                            System.out.println("Regresando...");
+                            Funciones.pause();
+                            break;
+                        }
+                    } while (!"r".equals(buscarComp));
+                    
+                } else if ("r".equals(opc)) {
+                    Funciones.cls();
+                    opc = pag;
+                    System.out.println("Regresando...");
+                    Funciones.pause();
+                    break;
+                } else {
+                    Funciones.cls();
+                    opc = pag;
+                    System.out.println("¡ERROR! Ingrese una opción correcta.");
+                    Funciones.pause();
+                    continue;
+                }
+            } while (!"r".equals(pag));
+        }
+    }
+
+    //Mostrar información de laboratorio
+    public static void infoLaboratorio(Estudiante est) {
+        MantenimientoControlador mantC = new MantenimientoControlador();
+        Mantenimiento mant = mantC.buscarMantenimientoEstudiante(est.getIdEstudiante());
+        
+        Laboratorio lab = mant.getLaboratorio();
+        
+        Funciones.cls();
+        System.out.println("""
+                    --------------------------------------------------
+                                  Información Laboratorio                  
+                    --------------------------------------------------""".indent(12));
+        System.out.println(lab.toString());
+        System.out.println("            --------------------------------------------------");
+        Funciones.pause();
+    }
+
+    //Menú de información de laboratorio
+    public static void menuInfoLaboratorio(Estudiante est) throws IOException {
+        //Variables
+        Scanner s = new Scanner(System.in);
+        String opcEst;
+        do {
+            Funciones.cls();
+            System.out.println("""
+                        -------------------------------------------
+                                        Laboratorio            
+                        -------------------------------------------
+                            1. Ver información
+                            2. Ver computadoras
+                            3. Regresar
+                        -------------------------------------------
+            """);
+            System.out.print("    Opción: ");
+            opcEst = s.next();
+            
+            switch (opcEst) {
+                case "1" -> {
+                    infoLaboratorio(est);
+                }
+                case "2" -> {
+                    infoComputadoras(est);
+                }
+                case "3" -> {
+                    Funciones.cls();
+                    System.out.println("Regresando...");
+                    Funciones.pause();
+                    break;
+                }
+                default -> {
+                    Funciones.cls();
+                    System.out.println("¡ERROR! Ingrese una opción correcta.");
+                    Funciones.pause();
+                }
+            }
+        } while (!"3".equals(opcEst));
+    }
+
+    //Menú - Sin mantenimiento asignado
+    public static int menu1(Estudiante estudiante) throws IOException {
         InputStream inputStream = System.in;
         Reader reader = new InputStreamReader(inputStream, "UTF-8");
         BufferedReader br = new BufferedReader(reader);
         Scanner s = new Scanner(System.in);
-
+        
         do {
             Funciones.cls();
             System.out.println("""
                     --------------------------------------------------
                                       Menú Principal                  
                     --------------------------------------------------
-                           ¡No estas asignado a un laboratorio!       
+                          ¡No estas asignado a un mantenimiento!       
 
-                          Si ya estas asignado a un laboratorio       
+                         Si ya estas asignado a un mantenimiento       
                               y sigue apareciendo este menú         
                               ¡CONTACTA A UN ADMINISTRADOR!           
 
                         1. Mostrar información personal
                         2. Editar datos personales            
                         3. Recargar menú                 
-                        4. Cerrar sesión               
+                        0. Cerrar sesión               
                     --------------------------------------------------
             """);
             System.out.print("    Opción: ");
@@ -473,10 +883,11 @@ public class MainEstudiante {
                     Funciones.pause();
                     return 0;
                 }
-                case "4" -> {
+                case "0" -> {
                     Funciones.cls();
                     System.out.println(" Cerrando sesión...\n");
                     Funciones.pause();
+                    estudiante.setCedula(null);
                     return 1;
                 }
                 default -> {
@@ -489,19 +900,176 @@ public class MainEstudiante {
         } while (true);
     }
 
+    //Menú - Con mantenimiento asignado
+    public static int menu2(Estudiante estudiante) throws IOException {
+        Scanner s = new Scanner(System.in);
+        
+        do {
+            Funciones.cls();
+            System.out.println("""
+                    --------------------------------------------------
+                                      Menú Principal                  
+                    --------------------------------------------------
+                        1. Realizar mantenimiento a computadora
+                        2. Ver laboratorio
+                        3. Verificar mantenimiento
+                        4. Finalizar mantenimiento
+                        5. Mostrar información personal
+                        6. Editar datos personales            
+                        7. Recargar menú                 
+                        0. Cerrar sesión               
+                    --------------------------------------------------
+            """);
+            System.out.print("    Opción: ");
+            String opc = s.next();
+            switch (opc) {
+                case "1" -> {
+                    mantComputadoras(estudiante);
+                }
+                case "2" -> {
+                    menuInfoLaboratorio(estudiante);
+                }
+                case "3" -> {
+                    estudiante.verificarMantenimiento();
+                }
+                case "4" -> {
+                    estudiante.finalizarMantenimiento();
+                    return 0;
+                }
+                case "5" -> {
+                    mostrarInfo(estudiante);
+                }
+                case "6" -> {
+                    estudiante.editarDatosPersonales();
+                }
+                case "7" -> {
+                    Funciones.cls();
+                    System.out.println(" Recargando menú...\n");
+                    Funciones.pause();
+                    return 0;
+                }
+                case "0" -> {
+                    Funciones.cls();
+                    System.out.println(" Cerrando sesión...\n");
+                    Funciones.pause();
+                    estudiante.setCedula(null);
+                    return 1;
+                }
+                default -> {
+                    Funciones.cls();
+                    System.out.println("¡ERROR! Ingrese una opción correcta.");
+                    Funciones.pause();
+                }
+            }
+        } while (true);
+    }
+    
+    //Menú - Finalizó mantenimiento
+    public static int menu3(Estudiante estudiante) throws IOException {
+        Scanner s = new Scanner(System.in);
+        
+        do {
+            Funciones.cls();
+            System.out.println("""
+                    --------------------------------------------------
+                                      Menú Principal                  
+                    --------------------------------------------------
+                        Usted ha acabado el mantenimiento, espere
+                             las indicaciones de su docente.
+                        1. Reanudar mantenimiento
+                        2. Ver laboratorio
+                        3. Verificar mantenimiento
+                        4. Mostrar información personal
+                        5. Editar datos personales            
+                        6. Recargar menú                 
+                        0. Cerrar sesión               
+                    --------------------------------------------------
+            """);
+            System.out.print("    Opción: ");
+            String opc = s.next();
+            switch (opc) {
+                case "1" -> {
+                    EstudianteControlador estC = new EstudianteControlador();
+                    estC.actualizarEstudianteMantenimiento(estudiante.getMatricula(), false);
+                    return 0;
+                }
+                case "2" -> {
+                    menuInfoLaboratorio(estudiante);
+                }
+                case "3" -> {
+                    estudiante.verificarMantenimiento();
+                }
+                case "4" -> {
+                    mostrarInfo(estudiante);
+                }
+                case "5" -> {
+                    estudiante.editarDatosPersonales();
+                }
+                case "6" -> {
+                    Funciones.cls();
+                    System.out.println(" Recargando menú...\n");
+                    Funciones.pause();
+                    return 0;
+                }
+                case "0" -> {
+                    Funciones.cls();
+                    System.out.println(" Cerrando sesión...\n");
+                    Funciones.pause();
+                    estudiante.setCedula(null);
+                    return 1;
+                }
+                default -> {
+                    Funciones.cls();
+                    System.out.println("¡ERROR! Ingrese una opción correcta.");
+                    Funciones.pause();
+                    break;
+                }
+            }
+        } while (true);
+    }
+    
     public static void main(String[] args) throws IOException {
         Estudiante est = logeoEstudiante();
         if (est != null) {
             do {
                 EstudianteControlador estC = new EstudianteControlador();
-                Estudiante estTemp = est;
+                MantenimientoControlador mantC = new MantenimientoControlador();
+                
                 est = estC.buscarEstudiante(est.getCedula());
-                if (est.getFinalizoMantenimiento() == 0) {
-                    int flag = subMenu1(estTemp);
+                est.setIdEstudiante(estC.buscarIdEstudiante(est.getMatricula()));
+                
+                Mantenimiento mant = mantC.buscarMantenimientoEstudiante(est.getIdEstudiante());
+                
+                if (mant.getIdMantenimiento() == 0) {
+                    int flag = menu1(est);
                     if (flag == 1) {
                         main(args);
                         break;
+                    } else if (flag == 0) {
+                        continue;
                     }
+                } else {
+                    if(est.isFinalizoMantenimiento()){
+                        int flag = menu3(est);
+                        if (flag == 1) {
+                            main(args);
+                            break;
+                        } else if (flag == 0) {
+                            continue;
+                        }
+                    } else {
+                        int flag = menu2(est);
+                        if (flag == 1) {
+                            main(args);
+                            break;
+                        } else if (flag == 0) {
+                            continue;
+                        }
+                    }
+                }
+                
+                if (est.getCedula() == null) {
+                    break;
                 }
             } while (true);
         }

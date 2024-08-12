@@ -9,21 +9,24 @@ package modelo;
  * @author Alejandro
  */
 public class Software {
+
     private int idSoftware;
     private String nombre;
     private String descripcion;
     private String version;
     private TipoSoftware tipo;
+    private Estado estado;
 
     public Software() {
     }
 
-    public Software(int idSoftware, String nombre, String descripcion, String version, TipoSoftware tipo) {
+    public Software(int idSoftware, String nombre, String descripcion, String version, TipoSoftware tipo, Estado estado) {
         this.idSoftware = idSoftware;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.version = version;
         this.tipo = tipo;
+        this.estado = estado;
     }
 
     public int getIdSoftware() {
@@ -64,5 +67,13 @@ public class Software {
 
     public void setTipo(TipoSoftware tipo) {
         this.tipo = tipo;
+    }
+
+    public Estado getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Estado estado) {
+        this.estado = estado;
     }
 }

@@ -9,6 +9,7 @@ package modelo;
  * @author LENOVO
  */
 public class DetalleMantenimiento {
+
     private int idDetMant;
     private Computadora computadora;
     private String descripcion;

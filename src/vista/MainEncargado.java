@@ -4,6 +4,10 @@
  */
 package vista;
 
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.PreparedStatement;
+import controlador.ComputadoraControlador;
+import controlador.ConexionBDD;
 import controlador.Funciones;
 import controlador.EncargadoControlador;
 import controlador.LaboratorioControlador;
@@ -14,8 +18,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.sql.ResultSet;
 import java.util.Scanner;
+import modelo.Computadora;
 import modelo.Encargado;
+import modelo.Estudiante;
 import modelo.Laboratorio;
 import modelo.Mantenimiento;
 
@@ -35,7 +42,7 @@ public class MainEncargado {
             2. Contactarse con un administrador
             3. Regresar
         -------------------------------------------
-        """.indent(30));
+        """.indent(10));
         System.out.print("  Opcion: ");
     }
 
@@ -57,19 +64,34 @@ public class MainEncargado {
                     do {
                         Funciones.cls();
                         enc = inicioSesion();
+                        String opcYN;
                         if ("0".equals(enc.getCedula())) {
-                            Funciones.cls();
-                            System.out.println("Usuario o contraseña incorrecto...\n");
-                            System.out.print("¿Desea regresar al menú anterior? [Y/n] ");
-                            String opcYN = s.next();
-                            if ("Y".equals(opcYN)) {
-                                break;
-                            } else if ("n".equals(opcYN)) {
-                            } else {
+                            do {
                                 Funciones.cls();
-                                System.out.println("¡ERROR! Ingrese una opción correcta.");
-                                Funciones.pause();
+                                System.out.println("Usuario o contraseña incorrecto...\n");
+                                System.out.print("¿Desea regresar al menú anterior? [Y/n] ");
+                                opcYN = s.next();
+                                switch (opcYN) {
+                                    case "Y" -> {
+                                        break;
+                                    }
+                                    case "n" -> {
+                                        break;
+                                    }
+                                    default -> {
+                                        Funciones.cls();
+                                        System.out.println("¡ERROR! Ingrese una opción correcta.");
+                                        Funciones.pause();
+                                        continue;
+                                    }
+                                }
+                                break;
+                            } while (true);
+                            
+                            if("Y".equals(opcYN)){
+                                break;
                             }
+                            
                         } else {
                             if ("0".equals(enc.getTelefono())) {
                                 enc = registro(enc.getCedula());
@@ -78,18 +100,29 @@ public class MainEncargado {
                             return enc;
                         }
                     } while (true);
-                    break;
                 }
-                //Contacto con administrador
                 case "2" -> {
                     Funciones.cls();
+                    System.out.println("""
+                                                    Si presenta errores con el sistema contactese
+                                                            a los siguientes números:
+                                       
+                                                             0995196339 - 0995113268
+                                       
+                                                  En caso de no recibir respuesta puede contactarse
+                                                          al siguiente correo electrónico:
+                                                    
+                                                     alejandro.cevallos919@ist17dejulio.edu.ec
+                                       """);
                     Funciones.pause();
-                    break;
                 }
                 //Regresar
                 case "3" -> {
+                    Funciones.pause();
                     System.out.println("Regresando...");
-                    return null;
+                    Funciones.cls();
+                    enc.setCedula(null);
+                    return enc;
                 }
                 default -> {
                     Funciones.cls();
@@ -325,18 +358,374 @@ public class MainEncargado {
             return enc;
         } while (true);
     }
-    
+
     //Mostrar información de cuenta
-    public static void mostrarInfo(Encargado enc){
+    public static void infoCuentaEncargado(Encargado enc) {
         Funciones.cls();
         System.out.println("""
                     --------------------------------------------------
                                    Información Personal                  
-                    --------------------------------------------------
-        """);
+                    --------------------------------------------------""".indent(12));
         System.out.println(enc.toString());
         System.out.println("            --------------------------------------------------");
         Funciones.pause();
+    }
+
+    //Imprimir computadoras
+    public static void infoComputadoras(String cedula) {
+        Scanner s = new Scanner(System.in);
+        
+        LaboratorioControlador labC = new LaboratorioControlador();
+        Laboratorio lab = labC.buscarLaboratorio(cedula);
+        lab.setIdLaboratorio(labC.buscarIdLaboratorio(cedula));
+
+        if (lab.getComputadoras().isEmpty()) {
+            Funciones.cls();
+            System.out.println("No existen computadoras registradas al laboratorio. Intentelo de nuevo más tarde.");
+            Funciones.pause();
+        } else {
+            Funciones.cls();
+            System.out.println("""
+                                ------------------------------------------------
+                                                  Introducción                  
+                                ------------------------------------------------
+                                   Bienvenido/a al apartado de información de
+                                   computadoras, a continuación se presentará
+                                      un listado de las computadoras en el
+                                                  laboratorio.
+                               
+                                 Para regresar al menú anterior puede ingresar
+                                 la letra 'r'. Si desea conocer más información
+                                   de un computador, ingrese 'b' y digite el
+                                      código del computador que necesite.
+                                             Gracias por leer :)
+                                ------------------------------------------------
+                               """);
+            Funciones.pause();
+            String opc = "1";
+            String pag = "1";
+
+            int finPag;
+
+            if (lab.getComputadoras().size() < 25) {
+                finPag = 1;
+            } else {
+                finPag = (int) Math.ceil(lab.getComputadoras().size() / 25);
+            }
+
+            do {
+                if (Funciones.isValidNumeric(opc)) {
+                    int a = Integer.parseInt(opc);
+                    if (a <= finPag){
+                        pag = opc;
+                        int x = a * 25;
+                        System.out.println(String.format("""
+                                                  --------------------------------------------------------------------
+                                                    Información de Computadoras  - %s
+                                                  --------------------------------------------------------------------
+                                                 |      Codigo      |             Marca            |      Estado      |
+                                            """, lab.getNombre()));
+                        if (a == finPag) {
+                            for (int i = (x - 25); i < lab.getComputadoras().size(); i++) {
+                                System.out.println(lab.getComputadoras().get(i).infoBasica());
+                            }
+                        } else {
+                            for (int i = (x - 25); i < x; i++) {
+                                System.out.println(lab.getComputadoras().get(i).infoBasica());
+                            }
+                        }
+                        System.out.println("      --------------------------------------------------------------------");
+                        System.out.println("                                                        Página. " + a);
+                        System.out.print("     Ingrese 'r' para regresar o 'b' para buscar. \n");
+                        System.out.print("     Ingrese el número de página u opción que desea: ");
+                        opc = s.next();
+                    } else {
+                        Funciones.cls();
+                        opc = pag;
+                        System.out.println("¡ERROR! Ingrese una opción correcta.");
+                        Funciones.pause();
+                    }
+                } else if ("b".equals(opc)) {
+                    String buscarComp;
+                    do {
+                        Funciones.cls();
+                        System.out.print("Ingrese r para regresar a visualizar las computadoras.\n");
+                        System.out.print("Ingrese el código de computadora a buscar: ");
+                        buscarComp = s.next();
+                        if (!"r".equals(buscarComp)) {
+                            if (Funciones.isValidCode(buscarComp)) {
+                                ComputadoraControlador compC = new ComputadoraControlador();
+                                Computadora comp = compC.
+                                        buscarComputadoraLaboratorio(
+                                                lab.getIdLaboratorio(),
+                                                buscarComp);
+                                if (comp.getIdComputadora() != 0) {
+                                    Funciones.cls();
+                                    System.out.println(comp.toString());
+                                    Funciones.pause();
+                                } else {
+                                    Funciones.cls();
+                                    System.out.println("¡ERROR! No se encontró la computadora, ingrese el código nuevamente.");
+                                    Funciones.pause();
+                                }
+                            } else {
+                                Funciones.cls();
+                                System.out.println("¡ERROR! Ingrese una opción correcta.");
+                                Funciones.pause();
+                            }
+                        } else {
+                            break;
+                        }
+                    } while (!"r".equals(buscarComp));
+
+                } else if ("r".equals(opc)) {
+                    Funciones.cls();
+                    System.out.println("Regresando...");
+                    Funciones.pause();
+                    break;
+                } else {
+                    Funciones.cls();
+                    opc = pag;
+                    System.out.println("¡ERROR! Ingrese una opción correcta.");
+                    Funciones.pause();
+                }
+            } while (!"r".equals(pag));
+        }
+    }
+    
+    //Mostrar información de laboratorio
+    public static void infoLaboratorio(String cedula) {
+        LaboratorioControlador labC = new LaboratorioControlador();
+        Laboratorio lab = labC.buscarLaboratorio(cedula);
+        lab.setIdLaboratorio(labC.buscarIdLaboratorio(cedula));
+        
+        Funciones.cls();
+        System.out.println("""
+                    --------------------------------------------------
+                                  Información Laboratorio                  
+                    --------------------------------------------------""".indent(12));
+        System.out.println(lab.toString());
+        System.out.println("            --------------------------------------------------");
+        Funciones.pause();
+    }
+    
+    //Mostrar estudiantes asignados
+    public static void estudiantesAsignados(String cedula) {
+        LaboratorioControlador labC = new LaboratorioControlador();
+        Laboratorio lab = labC.buscarLaboratorio(cedula);
+        lab.setIdLaboratorio(labC.buscarIdLaboratorio(cedula));
+        
+        MantenimientoControlador mantC = new MantenimientoControlador();
+        Mantenimiento mant = mantC.buscarMantenimiento(lab);
+        
+        Funciones.cls();
+        System.out.println("""
+                    ------------------------------------------------------
+                                    Estudiantes Asignados                  
+                    ------------------------------------------------------""".indent(12));
+        for (int i = 0; i < mant.getEstudiantes().size(); i++) {
+            Estudiante est = mant.getEstudiantes().get(i);
+            System.out.println("              " + (i+1) 
+                    + ". " + est.getNombre() 
+                    + " " + est.getApellido());
+        }
+        System.out.println("            ------------------------------------------------------");
+        Funciones.pause();
+    }
+    
+    //Mostrar Detalle Mantenimiento
+    public static void estudiantesMantenimientos(String cedula) {
+        LaboratorioControlador labC = new LaboratorioControlador();
+        Laboratorio lab = labC.buscarLaboratorio(cedula);
+        lab.setIdLaboratorio(labC.buscarIdLaboratorio(cedula));
+        
+        MantenimientoControlador mantC = new MantenimientoControlador();
+        Mantenimiento mant = mantC.buscarMantenimiento(lab);
+        
+        //Conexión
+        ConexionBDD conexion = new ConexionBDD();
+        Connection connection = (Connection) conexion.conectar();
+        PreparedStatement ejecutar;
+        ResultSet resultado;
+        try {
+            String consulta = "SELECT SUBSTRING_INDEX(det_mant_obj, '/-/', 1) AS est_cedula, usu_nombre, usu_apellido, "
+                    + "SUBSTRING_INDEX(SUBSTRING_INDEX(det_mant_obj, '/-/', 2), '/-/', -1) AS comp_codigo, "
+                    + "SUBSTRING_INDEX(SUBSTRING_INDEX(det_mant_obj, '/-/', 3), '/-/', -1) AS mant_tipo, "
+                    + "SUBSTRING_INDEX(SUBSTRING_INDEX(det_mant_obj, '/-/', 4), '/-/', -1) AS mant_obj "
+                    + "FROM detalle_mantenimiento dm, usuarios u "
+                    + "WHERE mant_id = " + mant.getIdMantenimiento() + " "
+                    + "AND usu_cedula = SUBSTRING_INDEX(det_mant_obj, '/-/', 1);";
+            ejecutar = (PreparedStatement) connection.prepareCall(consulta);
+            resultado = ejecutar.executeQuery(consulta);
+            
+            if(resultado.next()){
+                Funciones.cls();
+                int x = 0;
+                System.out.println("""
+                            ---------------------------------------------------------------
+                                              Detalle del Mantenimiento                  
+                            ---------------------------------------------------------------""".indent(15));
+                while (resultado.next()) {
+                    x++;
+                    String cedulaEstudiante = resultado.getString("est_cedula");
+                    String nombreCompleto = resultado.getString("usu_nombre") + " " 
+                            + resultado.getString("usu_apellido");
+                    String codigo = resultado.getString("comp_codigo");
+                    String tipo = resultado.getString("mant_tipo");
+                    String descripcion = resultado.getString("mant_obj");
+                    System.out.println(x + ". " + cedulaEstudiante + " / " 
+                            + nombreCompleto + " / "  
+                            + "Computadora - " + codigo + " / "
+                            + tipo + " / "  
+                            + descripcion + "\n" );
+                }
+                System.out.println("            ---------------------------------------------------------------");
+                Funciones.pause();
+            } else {
+                Funciones.cls();
+                System.out.println("Aún no haz realizado ningún mantenimiento a alguna computadora.");
+                Funciones.pause();
+            }
+            
+            resultado.close();
+        } catch (Exception e) {
+            System.out.println("¡ERROR EN EL SISTEMA! COMUNIQUESE CON EL ADMINISTRADOR\n"
+                    + "PARA SOLUCIONAR SU PROBLEMA: " + e);
+        }
+    }
+    
+    //Menú de información de laboratorio
+    public static void menuInfoLaboratorio(String cedula) throws IOException {
+        //Variables
+        Scanner s = new Scanner(System.in);
+        String opcEst;
+        do {
+            Funciones.cls();
+            System.out.println("""
+                        -------------------------------------------
+                                        Laboratorio            
+                        -------------------------------------------
+                            1. Ver información
+                            2. Ver computadoras
+                            3. Regresar
+                        -------------------------------------------
+            """);
+            System.out.print("    Opción: ");
+            opcEst = s.next();
+
+            switch (opcEst) {
+                case "1" -> {
+                    infoLaboratorio(cedula);
+                }
+                case "2" -> {
+                    infoComputadoras(cedula);
+                }
+                case "3" -> {
+                    Funciones.cls();
+                    System.out.println("Regresando...");
+                    Funciones.pause();
+                    break;
+                }
+                default -> {
+                    Funciones.cls();
+                    System.out.println("¡ERROR! Ingrese una opción correcta.");
+                    Funciones.pause();
+                }
+            }
+        } while (!"3".equals(opcEst));
+    }
+    
+    //Menú información de mantenimiento
+    public static void menuMantenimiento(String cedula) throws IOException {
+        //Variables
+        Scanner s = new Scanner(System.in);
+        String opcEst;
+        do {
+            Funciones.cls();
+            System.out.println("""
+                        --------------------------------------------
+                                        Mantenimiento            
+                        --------------------------------------------
+                            1. Ver estudiantes asignados
+                            2. Ver mantenimientos de estudiantes
+                            3. Regresar
+                        --------------------------------------------
+            """);
+            System.out.print("    Opción: ");
+            opcEst = s.next();
+
+            switch (opcEst) {
+                case "1" -> {
+                    estudiantesAsignados(cedula);
+                }
+                case "2" -> {
+                    estudiantesMantenimientos(cedula);
+                }
+                case "3" -> {
+                    Funciones.cls();
+                    System.out.println("Regresando...");
+                    Funciones.pause();
+                    break;
+                }
+                default -> {
+                    Funciones.cls();
+                    System.out.println("¡ERROR! Ingrese una opción correcta.");
+                    Funciones.pause();
+                }
+            }
+        } while (!"3".equals(opcEst));
+    }
+    
+    //Menú de informes
+    public static void menuInformes(String cedula) throws IOException {
+        LaboratorioControlador labC = new LaboratorioControlador();
+        Laboratorio lab = labC.buscarLaboratorio(cedula);
+        lab.setIdLaboratorio(labC.buscarIdLaboratorio(cedula));
+        
+        MantenimientoControlador mantC = new MantenimientoControlador();
+        Mantenimiento mant = mantC.buscarMantenimiento(lab);
+        
+        //Variables
+        Scanner s = new Scanner(System.in);
+        String opcEst;
+        do {
+            Funciones.cls();
+            System.out.println("""
+                        -------------------------------------------
+                                         Informes            
+                        -------------------------------------------
+                            1. Imprimir informe
+                            2. Buscar informe
+                            3. Imprimir informe de computadora
+                            4. Regresar
+                        -------------------------------------------
+            """);
+            System.out.print("    Opción: ");
+            opcEst = s.next();
+
+            switch (opcEst) {
+                case "1" -> {
+                    lab.imprimirInforme();
+                }
+                case "2" -> {
+                    infoComputadoras(cedula);
+                }
+                case "3" -> {
+                    lab.imprimirInformeComputadoras();
+                }
+                case "4" -> {
+                    Funciones.cls();
+                    System.out.println("Regresando...");
+                    Funciones.pause();
+                    break;
+                }
+                default -> {
+                    Funciones.cls();
+                    System.out.println("¡ERROR! Ingrese una opción correcta.");
+                    Funciones.pause();
+                }
+            }
+        } while (!"4".equals(opcEst));
     }
 
     //Menú - Sin laboratorio asignado
@@ -358,7 +747,7 @@ public class MainEncargado {
                         1. Mostrar información personal
                         2. Editar datos personales            
                         3. Recargar menú                 
-                        4. Cerrar sesión               
+                        0. Cerrar sesión               
                     --------------------------------------------------
             """);
             System.out.print("    Opción: ");
@@ -366,7 +755,7 @@ public class MainEncargado {
             switch (opc) {
                 //Mostrar información encargado
                 case "1" -> {
-                    mostrarInfo(encargado);
+                    infoCuentaEncargado(encargado);
                 }
                 //Editar información encargado
                 case "2" -> {
@@ -380,10 +769,11 @@ public class MainEncargado {
                     return 0;
                 }
                 //Cerrar sesión de la cuenta
-                case "4" -> {
+                case "0" -> {
                     Funciones.cls();
                     System.out.println(" Cerrando sesión...\n");
                     Funciones.pause();
+                    encargado.setCedula(null);
                     return 1;
                 }
                 default -> {
@@ -395,7 +785,7 @@ public class MainEncargado {
             }
         } while (true);
     }
-    
+
     //Menú - Laboratorio asignado
     public static int menu2(Encargado encargado) throws IOException {
         Scanner s = new Scanner(System.in);
@@ -408,7 +798,7 @@ public class MainEncargado {
                     --------------------------------------------------      
                         1. Comenzar mantenimiento
                         2. Imprimir informes
-                        3. Ver información computadoras
+                        3. Ver laboratorio
                         4. Mostrar información personal
                         5. Editar datos personales            
                         6. Recargar menú                 
@@ -422,8 +812,14 @@ public class MainEncargado {
                     encargado.realizarMantenimiento();
                     return 0;
                 }
+                case "2" -> {
+                    menuInformes(encargado.getCedula());
+                }
+                case "3" -> {
+                    menuInfoLaboratorio(encargado.getCedula());
+                }
                 case "4" -> {
-                    mostrarInfo(encargado);
+                    infoCuentaEncargado(encargado);
                 }
                 case "5" -> {
                     encargado.editarDatosPersonales();
@@ -438,6 +834,7 @@ public class MainEncargado {
                     Funciones.cls();
                     System.out.println(" Cerrando sesión...\n");
                     Funciones.pause();
+                    encargado.setCedula(null);
                     return 1;
                 }
                 default -> {
@@ -449,14 +846,18 @@ public class MainEncargado {
             }
         } while (true);
     }
-    
+
     //Menú - Mantenimiento inicializado
     public static int menu3(Encargado encargado) throws IOException {
         Scanner s = new Scanner(System.in);
-        
+
         LaboratorioControlador labC = new LaboratorioControlador();
         Laboratorio lab = labC.buscarLaboratorio(encargado.getCedula());
-
+        lab.setIdLaboratorio(labC.buscarIdLaboratorio(encargado.getCedula()));
+        
+        MantenimientoControlador mantC = new MantenimientoControlador();
+        Mantenimiento mant = mantC.buscarMantenimiento(lab);
+        
         do {
             Funciones.cls();
             System.out.println("""
@@ -464,12 +865,13 @@ public class MainEncargado {
                                       Menú Principal                  
                     --------------------------------------------------      
                         1. Asignar estudiantes a mantenimiento
-                        2. Ver estados de computadoras
-                        3. Verificar información de mantenimiento
-                        4. Finalizar mantenimiento
-                        5. Mostrar información personal
-                        6. Editar datos personales            
-                        7. Recargar menú                 
+                        2. Quitar estudiante de mantenimiento
+                        3. Ver laboratorio
+                        4. Información de mantenimiento
+                        5. Finalizar mantenimiento
+                        6. Mostrar información personal
+                        7. Editar datos personales            
+                        8. Recargar menú                 
                         0. Cerrar sesión               
                     --------------------------------------------------
             """);
@@ -477,14 +879,32 @@ public class MainEncargado {
             String opc = s.next();
             switch (opc) {
                 case "1" -> {
+                    mant.asignarEstudiante();
+                }
+                case "2" -> {
+                    mant.quitarEstudiante();
+                }
+                case "3" -> {
+                    menuInfoLaboratorio(encargado.getCedula());
+                }
+                case "4" -> {
+                    menuMantenimiento(encargado.getCedula());
                 }
                 case "5" -> {
-                    mostrarInfo(encargado);
+                    boolean finalizar = encargado.finalizarMantenimiento();
+                    if (finalizar) {
+                        return 0;
+                    }else{
+                        continue;
+                    }
                 }
                 case "6" -> {
-                    encargado.editarDatosPersonales();
+                    infoCuentaEncargado(encargado);
                 }
                 case "7" -> {
+                    encargado.editarDatosPersonales();
+                }
+                case "8" -> {
                     Funciones.cls();
                     System.out.println("Recargando menú...\n");
                     Funciones.pause();
@@ -494,6 +914,7 @@ public class MainEncargado {
                     Funciones.cls();
                     System.out.println("Cerrando sesión...\n");
                     Funciones.pause();
+                    encargado.setCedula(null);
                     return 1;
                 }
                 default -> {
@@ -508,28 +929,31 @@ public class MainEncargado {
 
     public static void main(String[] args) throws IOException {
         Encargado enc = logeoEncargado();
-        if (enc != null) {
+        if (enc.getCedula() != null) {
             do {
                 EncargadoControlador encC = new EncargadoControlador();
                 LaboratorioControlador labC = new LaboratorioControlador();
                 MantenimientoControlador mantC = new MantenimientoControlador();
-                
+
                 enc = encC.buscarEncargado(enc.getCedula());
+                
                 Laboratorio lab = labC.buscarLaboratorio(enc.getCedula());
                 lab.setIdLaboratorio(labC.buscarIdLaboratorio(enc.getCedula()));
-                Mantenimiento mant = mantC.buscarMantenimiento(lab);
                 
-                if (!enc.getCedula().equals(lab.getEncargado().getCedula())) {
+                Mantenimiento mant = new Mantenimiento();
+                mant.setIdMantenimiento(mantC.buscarIdMantenimiento(lab.getIdLaboratorio()));
+
+                if (enc.getCedula().equals(lab.getEncargado().getCedula()) == false) {
                     int flag = menu1(enc);
                     if (flag == 1) {
                         main(args);
                         break;
-                    }else if(flag == 0){
+                    } else if (flag == 0) {
                         continue;
                     }
                     break;
                 } else if (enc.getCedula().equals(lab.getEncargado().getCedula())) {
-                    if (mant.getIdMantenimiento() != 0){
+                    if (mant.getIdMantenimiento() != 0) {
                         int flag = menu3(enc);
                         switch (flag) {
                             case 0 -> {
@@ -562,7 +986,10 @@ public class MainEncargado {
                             }
                         }
                     }
-                    
+                }
+
+                if (enc.getCedula() == null) {
+                    break;
                 }
             } while (true);
         }

@@ -70,10 +70,12 @@ public class UsuarioControlador {
             resultado = ejecutar.executeQuery(consulta);
             
             if(resultado.next()){
-                int idPersona = resultado.getInt("usu_id");
-                return idPersona;
+                int idUsuario = resultado.getInt("usu_id");
+                ejecutar.close();
+                return idUsuario;
             }else{
                 System.out.println("¡ERROR! Ingrese una cédula válida");
+                ejecutar.close();
             }
             ejecutar.close();
         } catch (Exception e) {
